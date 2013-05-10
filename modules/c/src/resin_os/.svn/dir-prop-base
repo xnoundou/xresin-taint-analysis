@@ -1,0 +1,11 @@
+K 10
+svn:ignore
+V 46
+libresin_os.so
+
+
+libresin_os.jnilib
+
+Makefile
+
+END

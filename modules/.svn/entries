@@ -1,0 +1,172 @@
+10
+
+dir
+10051
+svn://svn.caucho.com/home/svn/svnroot/resin/trunk/modules
+svn://svn.caucho.com/home/svn/svnroot
+
+
+
+2013-05-09T20:23:36.520309Z
+10051
+nam
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+9c94448d-38f1-0310-a231-d98308ff1ebf
+
+ejb
+dir
+
+hibernate
+dir
+
+eclipselink
+dir
+
+ejb30
+dir
+
+jamp_prototype_early_
+dir
+
+javadoc
+dir
+
+jpa
+dir
+
+support
+dir
+
+saaj
+dir
+
+jta
+dir
+
+csharp
+dir
+
+compat
+dir
+
+jaxb
+dir
+
+quercus
+dir
+
+portlet
+dir
+
+hessian
+dir
+
+servlet16
+dir
+
+deploy
+dir
+
+gae
+dir
+
+jca
+dir
+
+ext
+dir
+
+resin-jsf
+dir
+
+osgi
+dir
+
+script
+dir
+
+webutil
+dir
+
+jstl
+dir
+
+jcache
+dir
+
+jcr
+dir
+
+candi
+dir
+
+resin
+dir
+
+experiment
+dir
+
+kernel
+dir
+
+c
+dir
+
+jsf
+dir
+
+extra
+dir
+
+unix
+dir
+
+jasper
+dir
+
+webbeans
+dir
+
+resource
+dir
+
+jaxrpc
+dir
+
+jms
+dir
+
+junit
+dir
+
+ecmascript
+dir
+
+javaee
+dir
+
+resin-jdk15
+dir
+
+flash
+dir
+
+jaxstream
+dir
+
+j2ee-management
+dir
+

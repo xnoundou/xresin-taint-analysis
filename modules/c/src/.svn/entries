@@ -1,0 +1,86 @@
+10
+
+dir
+10051
+svn://svn.caucho.com/home/svn/svnroot/resin/trunk/modules/c/src
+svn://svn.caucho.com/home/svn/svnroot
+
+
+
+2013-04-25T17:31:14.478806Z
+10040
+ferg
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+9c94448d-38f1-0310-a231-d98308ff1ebf
+
+isapi_64
+dir
+
+resin
+dir
+
+resin_os
+dir
+
+Makefile.in
+file
+
+
+
+
+2013-05-10T14:21:37.647801Z
+b75c6e211c5779f1a640d22d647fb229
+2012-05-29T14:35:08.692094Z
+9309
+cowan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+392
+
+apache2
+dir
+
+apache22
+dir
+
+common
+dir
+
+resin_os_64
+dir
+
+isapi_srun
+dir
+

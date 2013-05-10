@@ -1,0 +1,226 @@
+10
+
+dir
+10051
+svn://svn.caucho.com/home/svn/svnroot/resin/trunk/modules/resin/src/com/caucho
+svn://svn.caucho.com/home/svn/svnroot
+
+
+
+2013-05-09T20:23:36.520309Z
+10051
+nam
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+9c94448d-38f1-0310-a231-d98308ff1ebf
+
+profile
+dir
+
+ejb
+dir
+
+cloud
+dir
+
+xsl
+dir
+
+servlets
+dir
+
+naming
+dir
+
+jsmp
+dir
+
+resources
+dir
+
+jms2
+dir
+
+i18n
+dir
+
+license
+dir
+
+mail
+dir
+
+servlet
+dir
+
+burlap
+dir
+
+websocket
+dir
+
+amber
+dir
+
+php
+dir
+
+env
+dir
+
+network
+dir
+
+amqp
+dir
+
+gi
+dir
+
+bam
+dir
+
+tools
+dir
+
+hmpp
+dir
+
+config
+dir
+
+hmtp
+dir
+
+ejb3
+dir
+
+db
+dir
+
+hemp
+dir
+
+jms
+dir
+
+jmx
+dir
+
+jdbc
+dir
+
+boot
+dir
+
+server
+dir
+
+json
+dir
+
+mpc
+dir
+
+cluster
+dir
+
+message
+dir
+
+protocols
+dir
+
+quercus
+dir
+
+hessian
+dir
+
+remote
+dir
+
+jca
+dir
+
+vfs
+dir
+
+el
+dir
+
+jslib
+dir
+
+bootjni
+dir
+
+memcached
+dir
+
+security
+dir
+
+filters
+dir
+
+management
+dir
+
+jstl
+dir
+
+amp
+dir
+
+web
+dir
+
+util
+dir
+
+http
+dir
+
+resin
+dir
+
+log
+dir
+
+rewrite
+dir
+
+xml2
+dir
+
+jsf
+dir
+
+j2ee
+dir
+
+distcache
+dir
+
+admin
+dir
+
+jsp
+dir
+
+sql
+dir
+

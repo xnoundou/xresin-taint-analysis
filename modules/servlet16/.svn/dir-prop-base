@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 28
+classes
+jsdk.iml
+dist
+build
+
+END

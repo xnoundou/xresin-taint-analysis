@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 39
+classes
+j2ee-management.iml
+build
+dist
+
+END

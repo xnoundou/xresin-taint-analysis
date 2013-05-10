@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 30
+classes
+jaxrpc.iml
+build
+dist
+
+END

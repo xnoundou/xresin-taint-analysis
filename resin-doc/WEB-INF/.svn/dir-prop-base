@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 20
+classes
+db
+tmp
+work
+
+END

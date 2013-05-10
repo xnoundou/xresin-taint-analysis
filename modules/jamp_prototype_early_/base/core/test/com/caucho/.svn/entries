@@ -1,0 +1,43 @@
+10
+
+dir
+10051
+svn://svn.caucho.com/home/svn/svnroot/resin/trunk/modules/jamp_prototype_early_/base/core/test/com/caucho
+svn://svn.caucho.com/home/svn/svnroot
+
+
+
+2012-03-07T09:46:20.523404Z
+8974
+rick
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9c94448d-38f1-0310-a231-d98308ff1ebf
+
+example
+dir
+
+amp
+dir
+
+encoder
+dir
+
+test
+dir
+
+stomp
+dir
+

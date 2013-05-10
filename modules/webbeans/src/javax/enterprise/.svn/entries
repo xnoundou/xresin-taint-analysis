@@ -1,0 +1,40 @@
+10
+
+dir
+10051
+svn://svn.caucho.com/home/svn/svnroot/resin/trunk/modules/webbeans/src/javax/enterprise
+svn://svn.caucho.com/home/svn/svnroot
+
+
+
+2012-06-25T22:18:05.378935Z
+9474
+ferg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9c94448d-38f1-0310-a231-d98308ff1ebf
+
+inject
+dir
+
+util
+dir
+
+event
+dir
+
+context
+dir
+
