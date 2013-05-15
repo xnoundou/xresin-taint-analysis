@@ -34,12 +34,17 @@ import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.Value;
 import com.caucho.quercus.expr.Expr;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Represents an echo statement in a PHP program.
  */
 public class EchoStatement extends Statement {
   protected final Expr _expr;
 
+  private static Logger log = Logger.getLogger(EchoStatement.class.getName());  
+  
   /**
    * Creates the echo statement.
    */
@@ -55,6 +60,12 @@ public class EchoStatement extends Statement {
     Value value = _expr.eval(env);
 
     value.print(env);
+    
+    if ( value.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
+          value.toString() + "' used in echo from " +
+          value.getTaintInfo());    	
+    }
 
     return null;
   }

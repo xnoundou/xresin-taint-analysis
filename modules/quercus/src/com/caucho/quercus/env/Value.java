@@ -70,6 +70,20 @@ abstract public class Value implements java.io.Serializable
   // Properties
   //
 
+  protected TaintInfo _taintInfo = null;
+  
+  public TaintInfo getTaintInfo() {
+    return _taintInfo;
+  }
+  
+  public void setTaintInfo(TaintInfo taintInfo) {
+  	_taintInfo = taintInfo;
+  }
+  
+  public boolean isTainted() {
+  	return null != _taintInfo;
+  }
+  
   /**
    * Returns the value's class name.
    */

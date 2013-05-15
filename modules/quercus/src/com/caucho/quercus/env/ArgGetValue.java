@@ -46,6 +46,10 @@ public class ArgGetValue extends ArgValue
   {
     _obj = obj;
     _index = index;
+        
+    if ( null != _index && _index.isTainted() ) {
+    	super.setTaintInfo( TaintInfo.getTaintedInfoGET(_index) );
+    }      
   }
 
   public Value toRefValue()

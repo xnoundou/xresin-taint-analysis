@@ -34,6 +34,7 @@ import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.QuercusClass;
 import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.Value;
+import com.caucho.quercus.env.ConstStringValue;
 import com.caucho.quercus.env.Var;
 import com.caucho.quercus.parser.QuercusParser;
 import com.caucho.quercus.statement.Statement;
@@ -41,6 +42,8 @@ import com.caucho.util.L10N;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import com.caucho.quercus.env.TaintInfo;
 
 /**
  * Represents a PHP expression.
@@ -53,6 +56,9 @@ abstract public class Expr {
 
   private final Location _location;
 
+  //++ Taint Analysis
+  protected TaintInfo _tainted = null;
+  
   public Expr(Location location)
   {
     _location = location;
@@ -63,6 +69,35 @@ abstract public class Expr {
     _location = Location.UNKNOWN;
   }
 
+  //++ Taint Analysis
+  public boolean isTainted()
+  {
+  	return null != _tainted;
+  }
+  
+  //++ Taint Analysis
+  public void setTaint(TaintInfo tainted)
+  {
+  	_tainted = tainted;
+  }
+  
+  //++ Taint Analysis
+  public TaintInfo getTaintInfo()
+  {
+  	return _tainted;
+  } 
+  
+  //++ Taint Analysis
+  protected void copyAndSetTaintInfo(Expr value) {
+  	this.copyAndSetTaintInfo(value, TaintInfo.PropagationType.COPY);
+  }  
+  
+  protected void copyAndSetTaintInfo(Expr value, TaintInfo.PropagationType propType) {
+  	TaintInfo t = value.getTaintInfo();
+  	t.setPropagationType( propType );
+  	this.setTaint( t );	
+  }    
+  
   /**
    * Returns the location.
    */

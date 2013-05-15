@@ -30,7 +30,9 @@
 package com.caucho.quercus.expr;
 
 import com.caucho.quercus.Location;
+import com.caucho.quercus.env.ArrayValueImpl;
 import com.caucho.quercus.env.Env;
+import com.caucho.quercus.env.TaintInfo;
 import com.caucho.quercus.env.Value;
 import com.caucho.quercus.env.Var;
 
@@ -45,15 +47,32 @@ public class ArrayGetExpr extends AbstractVarExpr {
   {
     super(location);
     _expr = expr;
-    _index = index;
+    _index = index;     
   }
 
   public ArrayGetExpr(Expr expr, Expr index)
   {
     _expr = expr;
-    _index = index;
+    _index = index;    
   }
 
+  //++ Taint Analysis
+  protected void setTaintInfoForVal(String arrayName, Value aVal) 
+  {
+  	if ( null != arrayName && arrayName.equals("_POST") )
+  	{
+  		aVal.setTaintInfo( TaintInfo.getTaintedInfoPOST(aVal) );
+  	}
+  	else if ( null != arrayName && arrayName.equals("_GET") )
+  	{
+  		aVal.setTaintInfo( TaintInfo.getTaintedInfoGET(aVal) );
+  	}
+  	else if ( null != arrayName && arrayName.equals("_COOKIE") )
+  	{
+  		aVal.setTaintInfo( TaintInfo.getTaintedInfoCOOKIE(aVal) );
+  	}  		 	
+  }
+  
   /**
    * Returns the expr.
    */
@@ -83,7 +102,16 @@ public class ArrayGetExpr extends AbstractVarExpr {
     Value array = _expr.eval(env);
     Value index = _index.eval(env);
 
-    return array.get(index);
+    Value retVal = array.get(index);
+    
+  	if ( array instanceof ArrayValueImpl && 
+  			 _expr instanceof VarExpr ) 
+  	{
+  		String arrayName = ((VarExpr)_expr).getName().toString();        
+  		setTaintInfoForVal( arrayName, retVal );
+  	}
+  	
+  	return retVal;
   }
 
   /**
@@ -98,8 +126,17 @@ public class ArrayGetExpr extends AbstractVarExpr {
   {
     Value array = _expr.eval(env);
     Value index = _index.eval(env);
+    
+    Value retVal = array.get(index).copy();
 
-    return array.get(index).copy();
+    if ( array instanceof ArrayValueImpl && 
+    		_expr instanceof VarExpr ) 
+    {
+    	String arrayName = ((VarExpr)_expr).getName().toString();        
+    	setTaintInfoForVal( arrayName, retVal );
+    }   
+    
+    return retVal; 
   }
 
   /**

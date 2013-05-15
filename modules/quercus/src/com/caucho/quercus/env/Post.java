@@ -219,6 +219,10 @@ public class Post
         value.appendReadAll(is, Integer.MAX_VALUE);
 
         if (name != null) {
+        	
+        	//++ Taint Analysis
+        	value.setTaintInfo( TaintInfo.getTaintedInfoPOST(value) );
+        	
           addFormValue(env, postArray, name, value, null, addSlashesToValues, true);
         }
         else {

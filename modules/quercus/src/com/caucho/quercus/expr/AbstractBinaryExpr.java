@@ -31,6 +31,8 @@ package com.caucho.quercus.expr;
 
 import com.caucho.quercus.Location;
 
+import com.caucho.quercus.env.TaintInfo;
+
 /**
  * Common analysis for a PHP binary expression.
  */
@@ -43,12 +45,26 @@ abstract public class AbstractBinaryExpr extends Expr {
     super(location);
     _left = left;
     _right = right;
+    
+    if ( null != _right && _right.isTainted() ) {
+    	copyAndSetTaintInfo(_right, TaintInfo.PropagationType.OP_COPY);
+    }       
+    else if ( null != left && _left.isTainted() ) {
+    	copyAndSetTaintInfo(_left, TaintInfo.PropagationType.OP_COPY);
+    }
   }
 
   protected AbstractBinaryExpr(Expr left, Expr right)
   {
     _left = left;
     _right = right;
+    
+    if ( null != _right && _right.isTainted() ) {
+    	copyAndSetTaintInfo(_right, TaintInfo.PropagationType.OP_COPY);
+    }       
+    else if ( null != left && _left.isTainted() ) {
+    	copyAndSetTaintInfo(_left, TaintInfo.PropagationType.OP_COPY);
+    }     
   }
 
   /**
