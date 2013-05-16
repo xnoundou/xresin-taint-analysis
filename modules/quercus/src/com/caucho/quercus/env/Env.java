@@ -3094,7 +3094,12 @@ public class Env
     EnvVar envVar = getEnvVar(name, true, false);
 
     envVar.set(value);
-
+    
+    if ( value.isTainted() )
+    {
+    	envVar.setTaintInfo( value.getTaintInfo() );
+    }
+    
     return value;
   }
 
@@ -3106,6 +3111,11 @@ public class Env
     EnvVar envVar = getEnvVar(name, true, false);
 
     envVar.setVar(var);
+    
+    if ( var.isTainted() )
+    {
+    	envVar.setTaintInfo( var.getTaintInfo() );
+    }    
 
     return var;
   }

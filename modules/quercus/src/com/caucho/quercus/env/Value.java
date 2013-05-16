@@ -1955,10 +1955,23 @@ abstract public class Value implements java.io.Serializable
    */
   public Value add(Value rValue)
   {
+  	Value retAddVal = null;
+  	
     if (getValueType().isLongAdd() && rValue.getValueType().isLongAdd())
-      return LongValue.create(toLong() + rValue.toLong());
-
-    return DoubleValue.create(toDouble() + rValue.toDouble());
+    {
+    	retAddVal = LongValue.create(toLong() + rValue.toLong());
+    }
+    else
+    {
+      retAddVal = DoubleValue.create(toDouble() + rValue.toDouble());
+    }
+    
+    if ( this.isTainted() || rValue.isTainted() )
+    {
+    	retAddVal.setTaintInfo( TaintInfo.getTaintedInfoVAR(retAddVal) );
+    }
+    
+    return retAddVal;
   }
 
   /**

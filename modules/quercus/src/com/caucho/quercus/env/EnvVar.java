@@ -35,6 +35,19 @@ package com.caucho.quercus.env;
  */
 abstract public class EnvVar
 {
+	
+	protected TaintInfo _taintInfo;
+	
+	public void setTaintInfo(TaintInfo taintInfo)
+	{
+		_taintInfo = taintInfo;
+	}
+	
+	public TaintInfo getTaintInfo()
+	{
+		return _taintInfo;			
+	}
+	
   /**
    * Returns the current value.
    */

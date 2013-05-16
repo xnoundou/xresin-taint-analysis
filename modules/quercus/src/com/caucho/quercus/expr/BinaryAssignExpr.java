@@ -47,22 +47,14 @@ public class BinaryAssignExpr extends Expr {
     super(location);
 
     _var = var;
-    _value = value;
-    
-    if ( null != value && value.isTainted() ) {
-    	copyAndSetTaintInfo(value);
-    }    
+    _value = value;    
   }
 
   //++ Taint Analysis
   public BinaryAssignExpr(AbstractVarExpr var, Expr value)
   {
     _var = var;
-    _value = value;
-    
-    if ( null != value && value.isTainted() ) {
-    	copyAndSetTaintInfo(value);
-    }        
+    _value = value;       
   }
 
   /**
@@ -95,7 +87,13 @@ public class BinaryAssignExpr extends Expr {
   @Override
   public Value eval(Env env)
   {
-    return _var.evalAssignValue(env, _value);
+  	Value retVal = _var.evalAssignValue(env, _value); 
+  	
+    if ( null != _value && _value.isTainted() ) {
+    	copyAndSetTaintInfo(_value);
+    }
+    
+    return retVal;
   }
 
   /**
