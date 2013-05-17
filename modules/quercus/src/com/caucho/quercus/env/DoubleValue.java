@@ -230,19 +230,35 @@ public class DoubleValue extends NumberValue
 
   /**
    * Converts to a string builder
+   * ++ Taint Analysis
    */
   @Override
   public StringValue toStringBuilder(Env env)
   {
-    return env.createUnicodeBuilder().append(toString());
+    StringValue sv = env.createUnicodeBuilder().append(toString());
+    
+    if ( this.isTainted() )
+    {
+    	sv.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return sv;    
   }
 
   /**
    * Converts to a key.
+   * ++ Taint Analysis
    */
   public Value toKey()
   {
-    return LongValue.create((long) _value);
+  	Value v = LongValue.create((long) _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }  	
+  	
+    return v;    
   }
 
   /**
@@ -255,10 +271,18 @@ public class DoubleValue extends NumberValue
 
   /**
    * Negates the value.
+   * ++ Taint Analysis
    */
   public Value neg()
   {
-    return new DoubleValue(- _value);
+  	Value v = new DoubleValue(- _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }  	
+  	
+    return v;    
   }
 
   /**
@@ -271,31 +295,58 @@ public class DoubleValue extends NumberValue
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value add(Value rValue)
   {
-    return new DoubleValue(_value + rValue.toDouble());
+    Value v = new DoubleValue(_value + rValue.toDouble());
+    
+    if ( this.isTainted() || rValue.isTainted() )
+    {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );    	
+    }
+    
+    return v;
   }
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value add(long lValue)
   {
-    return new DoubleValue(lValue + _value);
+  	Value v = new DoubleValue(lValue + _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value addOne()
   {
-    return new DoubleValue(_value + 1);
+  	Value v = new DoubleValue(_value + 1);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;        
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value subOne()
@@ -307,78 +358,159 @@ public class DoubleValue extends NumberValue
       return LongValue.create(next);
     else
     */
-    return new DoubleValue(next);
+  	Value v = new DoubleValue(next);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;         
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value preincr()
   {
-    return new DoubleValue(_value + 1);
+  	Value v = new DoubleValue(_value + 1);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;    
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value predecr()
-  {
-    return new DoubleValue(_value - 1);
+  {    
+  	Value v = new DoubleValue(_value - 1);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value postincr()
   {
-    return new DoubleValue(_value + 1);
+  	Value v = new DoubleValue(_value + 1);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;    
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   @Override
   public Value postdecr()
   {
-    return new DoubleValue(_value - 1);
+  	Value v = new DoubleValue(_value - 1);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   public Value increment(int incr)
   {
-    return new DoubleValue(_value + incr);
+  	Value v = new DoubleValue(_value + incr);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;   
   }
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value mul(Value rValue)
-  {
-    return new DoubleValue(_value * rValue.toDouble());
+  {    
+  	Value v = new DoubleValue(_value * rValue.toDouble());
+  	
+    if ( this.isTainted() || rValue.isTainted() )
+    {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );    	
+    }  	
+  	
+    return v;    
   }
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value mul(long lValue)
   {
-    return new DoubleValue(lValue * _value);
+  	Value v = new DoubleValue(lValue * _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;    
   }
 
   /**
    * Absolute value.
+   * ++ Taint Analysis
    */
   public Value abs()
   {
     if (_value >= 0)
+    {
       return this;
+    }
     else
-      return DoubleValue.create(- _value);
+    {
+      Value v = DoubleValue.create(- _value);
+      if ( this.isTainted() )
+      {
+      	v.setTaintInfo( this.getTaintInfo() );
+      }
+      
+      return v;
+    }
   }
 
   /**
@@ -415,6 +547,7 @@ public class DoubleValue extends NumberValue
 
   /**
    * Converts to a string.
+   * ++ Taint Analysis
    *
    * @param env
    */
@@ -422,7 +555,14 @@ public class DoubleValue extends NumberValue
   {
     String str = toString(env.getLocaleInfo().getNumeric());
 
-    return env.createStringBuilder().append(str);
+    StringValue sv = env.createStringBuilder().append(str);
+    
+    if ( this.isTainted() )
+    {
+    	sv.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return sv;
   }
 
   /**

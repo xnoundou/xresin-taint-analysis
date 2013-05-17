@@ -232,11 +232,19 @@ public class LongValue extends NumberValue
 
   /**
    * Converts to a string builder
+   * ++ Taint Analysis
    */
   @Override
   public StringValue toStringBuilder(Env env)
   {
-    return env.createUnicodeBuilder().append(_value);
+    StringValue sv = env.createUnicodeBuilder().append(_value);
+    
+    if ( this.isTainted() )
+    {
+    	sv.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return sv;      
   }
 
   /**
@@ -291,7 +299,14 @@ public class LongValue extends NumberValue
   @Override
   public Value neg()
   {
-    return LongValue.create(- _value);
+  	Value v = LongValue.create(- _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }  	
+  	
+    return v;      
   }
 
   /**
@@ -311,7 +326,15 @@ public class LongValue extends NumberValue
   {
     long newValue = _value + 1;
 
-    return LongValue.create(newValue);
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;      
   }
 
   /**
@@ -322,7 +345,15 @@ public class LongValue extends NumberValue
   {
     long newValue = _value - 1;
 
-    return LongValue.create(newValue);
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
@@ -344,7 +375,15 @@ public class LongValue extends NumberValue
   {
     long newValue = _value - 1;
 
-    return LongValue.create(newValue);
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;      
   }
 
   /**
@@ -355,7 +394,15 @@ public class LongValue extends NumberValue
   {
     long newValue = _value + 1;
 
-    return LongValue.create(newValue);
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
@@ -365,8 +412,16 @@ public class LongValue extends NumberValue
   public Value postdecr()
   {
     long newValue = _value - 1;
-
-    return LongValue.create(newValue);
+    
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;    
   }
 
   /**
@@ -377,7 +432,15 @@ public class LongValue extends NumberValue
   {
     long newValue = _value + incr;
 
-    return LongValue.create(newValue);
+  	Value v = LongValue.create(newValue);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
@@ -386,7 +449,14 @@ public class LongValue extends NumberValue
   @Override
   public Value add(Value value)
   {
-    return value.add(_value);
+    Value v = value.add(_value);
+    
+    if ( this.isTainted() || value.isTainted() )
+    {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );    	
+    }
+    
+    return v;    
   }
 
   /**
@@ -395,7 +465,15 @@ public class LongValue extends NumberValue
   @Override
   public Value add(long lLong)
   {
-    return LongValue.create(lLong + _value);
+  	Value v = LongValue.create(lLong + _value);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;    
   }
 
   /**
@@ -404,10 +482,19 @@ public class LongValue extends NumberValue
   @Override
   public Value sub(Value rValue)
   {
+  	Value v = null;
+  	
     if (rValue.isLongConvertible())
-      return LongValue.create(_value - rValue.toLong());
+      v = LongValue.create(_value - rValue.toLong());
     else
-      return DoubleValue.create(_value - rValue.toDouble());
+      v = DoubleValue.create(_value - rValue.toDouble());
+    
+    if ( this.isTainted() || rValue.isTainted() )
+    {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }
+    
+    return v;
   }
 
   /**
@@ -416,7 +503,15 @@ public class LongValue extends NumberValue
   @Override
   public Value sub(long rLong)
   {
-    return LongValue.create(_value - rLong);
+  	Value v = LongValue.create(_value - rLong);
+  	
+    if ( this.isTainted() )
+    {
+    	v.setTaintInfo( this.getTaintInfo() );
+    	v.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }  	
+  	
+    return v;     
   }
 
   /**
@@ -426,9 +521,19 @@ public class LongValue extends NumberValue
   public Value abs()
   {
     if (_value >= 0)
+    {
       return this;
+    }
     else
-      return LongValue.create(- _value);
+    {
+      Value v = LongValue.create(- _value);
+      if ( this.isTainted() )
+      {
+      	v.setTaintInfo( this.getTaintInfo() );
+      }
+      
+      return v;      
+    }
   }
 
   /**
@@ -517,7 +622,14 @@ public class LongValue extends NumberValue
   @Override
   public StringValue appendTo(UnicodeBuilderValue sb)
   {
-    return sb.append(_value);
+    StringValue sv = sb.append(_value);
+    
+    if ( this.isTainted() )
+    {
+    	sv.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return sv;    
   }
 
   /**
@@ -526,7 +638,14 @@ public class LongValue extends NumberValue
   @Override
   public StringValue appendTo(BinaryBuilderValue sb)
   {
-    return sb.append(_value);
+    StringValue sv = sb.append(_value);
+    
+    if ( this.isTainted() )
+    {
+    	sv.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return sv;      
   }
 
   /**
@@ -535,7 +654,15 @@ public class LongValue extends NumberValue
   @Override
   public StringValue appendTo(StringBuilderValue sb)
   {
-    return sb.append(_value);
+    StringValue sv = sb.append(_value);
+    
+    if ( this.isTainted() || sb.isTainted() )
+    {
+    	//sv.setTaintInfo( TaintInfo.getTaintedInfoVAR(TaintInfo.PropagationType.) );
+    	
+    }
+    
+    return sv;     
   }
 
   /**
