@@ -152,4 +152,12 @@
     </host>
   </cluster>
 
+  <!--<database jndi-name="jdbc/bookstore">
+            <driver type="com.mysql.jdbc.Driver">
+	    <url>jdbc:mysql://localhost:3306/bookstore</url>
+            <user>developer</user>
+            <password>javaee6!</password>
+            </driver>
+	  </database>-->
+
 </resin>

@@ -1,0 +1,9 @@
+modules/*/
+lib/*.jar
+bin/*.svn-base
+bin/*
+bin/*/
+lib/*.LICENSE
+.classpath
+.project
+.settings

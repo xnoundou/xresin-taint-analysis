@@ -1952,6 +1952,7 @@ abstract public class Value implements java.io.Serializable
 
   /**
    * Adds to the following value.
+   * ++ Taint Analysis
    */
   public Value add(Value rValue)
   {
@@ -1976,10 +1977,17 @@ abstract public class Value implements java.io.Serializable
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value add(long lLong)
   {
-    return new DoubleValue(lLong + toDouble());
+  	Value v = new DoubleValue(lLong + toDouble());
+  	
+  	if ( this.isTainted() ) {
+  		v.setTaintInfo( TaintInfo.getTaintedInfoVAR(this.getTaintInfo().getTaintedVal()) );
+  	}
+  	
+    return v;
   }
 
   /**
@@ -2048,153 +2056,264 @@ abstract public class Value implements java.io.Serializable
 
   /**
    * Increment the following value.
+   * ++ Taint Analysis
    */
   public Value increment(int incr)
   {
     long lValue = toLong();
 
-    return LongValue.create(lValue + incr);
+    Value v = LongValue.create(lValue + incr);
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return v;
   }
 
   /**
    * Subtracts to the following value.
+   * ++ Taint Analysis
    */
   public Value sub(Value rValue)
   {
-    if (getValueType().isLongAdd() && rValue.getValueType().isLongAdd())
-      return LongValue.create(toLong() - rValue.toLong());
-
-    return DoubleValue.create(toDouble() - rValue.toDouble());
+  	Value v = null;
+  	
+    if (getValueType().isLongAdd() && rValue.getValueType().isLongAdd()) {
+      v = LongValue.create(toLong() - rValue.toLong());
+    }
+    else {
+    	v = DoubleValue.create(toDouble() - rValue.toDouble());
+    }
+    
+    if ( this.isTainted() || rValue.isTainted() ) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }
+    
+    return v;
   }
 
   /**
    * Subtracts
+   * ++ Taint Analysis
    */
   public Value sub(long rLong)
   {
-    return new DoubleValue(toDouble() - rLong);
+    Value v = new DoubleValue(toDouble() - rLong);
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return v;
   }
 
 
   /**
    * Substracts from the previous value.
+   * ++ Taint Analysis
    */
   public Value sub_rev(long lLong)
   {
+  	Value v = null;
+  	
     if (getValueType().isLongAdd())
-      return LongValue.create(lLong - toLong());
+      v = LongValue.create(lLong - toLong());
     else
-      return new DoubleValue(lLong - toDouble());
+      v = new DoubleValue(lLong - toDouble());
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }    
+    
+    return v;
   }
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value mul(Value rValue)
   {
+  	Value v = null;
+  	
     if (getValueType().isLongAdd() && rValue.getValueType().isLongAdd())
-      return LongValue.create(toLong() * rValue.toLong());
+      v = LongValue.create(toLong() * rValue.toLong());
     else
-      return new DoubleValue(toDouble() * rValue.toDouble());
+      v = new DoubleValue(toDouble() * rValue.toDouble());
+
+    if ( this.isTainted() || rValue.isTainted() ) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }
+    
+    return v;
   }
 
   /**
    * Multiplies to the following value.
+   *  ++ Taint Analysis
    */
   public Value mul(long r)
   {
+  	Value v = null;
+  	
     if (isLongConvertible())
-      return LongValue.create(toLong() * r);
+      v = LongValue.create(toLong() * r);
     else
-      return new DoubleValue(toDouble() * r);
+      v = new DoubleValue(toDouble() * r);
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }    
+    
+    return v;
   }
 
   /**
    * Divides the following value.
+   *  ++ Taint Analysis
    */
   public Value div(Value rValue)
   {
+  	Value v = null;
+  	
     if (getValueType().isLongAdd() && rValue.getValueType().isLongAdd()) {
       long l = toLong();
       long r = rValue.toLong();
 
       if (r != 0 && l % r == 0)
-        return LongValue.create(l / r);
+        v = LongValue.create(l / r);
       else
-        return new DoubleValue(toDouble() / rValue.toDouble());
+        v = new DoubleValue(toDouble() / rValue.toDouble());
     }
     else
-      return new DoubleValue(toDouble() / rValue.toDouble());
+      v = new DoubleValue(toDouble() / rValue.toDouble());
+    
+    if ( this.isTainted() || rValue.isTainted() ) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }    
+    
+    return v;
   }
 
   /**
    * Multiplies to the following value.
+   * ++ Taint Analysis
    */
   public Value div(long r)
   {
+  	Value v = null;
     long l = toLong();
 
     if (r != 0 && l % r == 0)
-      return LongValue.create(l / r);
+      v = LongValue.create(l / r);
     else
-      return new DoubleValue(toDouble() / r);
+      v = new DoubleValue(toDouble() / r);
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }    
+    
+    return v;
   }
 
   /**
    * modulo the following value.
+   * ++ Taint Analysis
    */
   public Value mod(Value rValue)
   {
     double lDouble = toDouble();
     double rDouble = rValue.toDouble();
 
-    return LongValue.create((long) lDouble % rDouble);
+    Value v = LongValue.create((long) lDouble % rDouble);
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }    
+    
+    return v;
   }
 
   /**
    * Shifts left by the value.
+   * ++ Taint Analysis
    */
   public Value lshift(Value rValue)
   {
     long lLong = toLong();
     long rLong = rValue.toLong();
 
-    return LongValue.create(lLong << rLong);
+    Value v = LongValue.create(lLong << rLong);
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }    
+    
+    return v;
   }
 
   /**
    * Shifts right by the value.
+   * ++ Taint Analysis
    */
   public Value rshift(Value rValue)
   {
     long lLong = toLong();
     long rLong = rValue.toLong();
 
-    return LongValue.create(lLong >> rLong);
+    Value v = LongValue.create(lLong >> rLong);
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    } 
+    
+    return v;
   }
 
-  /*
+  /**
    * Binary And.
+   * ++ Taint Analysis
    */
   public Value bitAnd(Value rValue)
   {
-    return LongValue.create(toLong() & rValue.toLong());
+    Value v = LongValue.create(toLong() & rValue.toLong());
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }     
+    
+    return v;
   }
 
-  /*
+  /**
    * Binary or.
+   * ++ Taint Analysis
    */
   public Value bitOr(Value rValue)
   {
-    return LongValue.create(toLong() | rValue.toLong());
+    Value v = LongValue.create(toLong() | rValue.toLong());
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }     
+    
+    return v;    
   }
 
   /**
    * Binary xor.
+   * ++ Taint Analysis
    */
   public Value bitXor(Value rValue)
   {
-    return LongValue.create(toLong() ^ rValue.toLong());
+    Value v = LongValue.create(toLong() ^ rValue.toLong());
+    
+    if ( this.isTainted() || rValue.isTainted()) {
+    	v.setTaintInfo( TaintInfo.getTaintedInfoVAR(v) );
+    }     
+    
+    return v;    
   }
 
   /**
@@ -2202,10 +2321,18 @@ abstract public class Value implements java.io.Serializable
    */
   public Value abs()
   {
+  	Value v = null;
+  	
     if (getValueType().isDoubleCmp())
-      return new DoubleValue(Math.abs(toDouble()));
+      v = new DoubleValue(Math.abs(toDouble()));
     else
-      return LongValue.create(Math.abs(toLong()));
+      v = LongValue.create(Math.abs(toLong()));
+    
+    if ( this.isTainted() ) {
+    	v.setTaintInfo( this.getTaintInfo() );
+    }       
+    
+    return v;
   }
 
   /**

@@ -998,6 +998,7 @@ public class MysqlModule extends AbstractQuercusModule {
 
   /**
    * Returns result set or false on error
+   * ++ Taint Analysis
    */
   public static Value mysql_db_query(Env env,
                                      String databaseName,
@@ -1007,6 +1008,12 @@ public class MysqlModule extends AbstractQuercusModule {
     if (conn == null)
       conn = getConnection(env);
 
+    if ( null != query && query.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: using tainted query string '" +
+          		query + "'. tainted from " +
+          		query.getTaintInfo());     	
+    }
+    
     if (! conn.select_db(env, databaseName))
       return BooleanValue.FALSE;
 
