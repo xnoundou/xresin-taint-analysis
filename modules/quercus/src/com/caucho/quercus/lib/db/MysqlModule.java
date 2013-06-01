@@ -1008,6 +1008,8 @@ public class MysqlModule extends AbstractQuercusModule {
     if (conn == null)
       conn = getConnection(env);
 
+    log.log(Level.WARNING, "test this");
+    
     if ( null != query && query.isTainted() ) {
       log.log(Level.WARNING, "[TAINT ANALYSIS]: using tainted query string '" +
           		query + "'. tainted from " +
