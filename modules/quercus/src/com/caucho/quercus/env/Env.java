@@ -2271,6 +2271,9 @@ public class Env
       envVar = new EnvVarImpl(var);
     }
 
+    if ( name.isTainted() )
+    	envVar.setTaintInfo( name.getTaintInfo() );
+    
     _globalMap.put(name, envVar);
 
     return envVar;

@@ -2,9 +2,9 @@
 // Create connection
  $con=mysqli_connect("localhost","pepsi","cola","test");
 
-$db = $_GET["db"];
+$desk = $_GET["table"];
 
-ECHO "DB IS: " . $db . '\n';
+#print "Table is: " . $desk . '\n';
 
 // Check connection
 if (mysqli_connect_errno($con))
@@ -13,9 +13,9 @@ if (mysqli_connect_errno($con))
 }
 else  
 {
-  $sql = "SELECT * FROM " . $db . ";";
+  $sql = "SELECT * FROM " . $desk . ";";
   
-  print "Query to execute: " . $sql . "\n";
+  #print "Query to execute: " . $sql . "\n";
 
   //mysql_query($sql, $con);
   $result = mysql_query($sql, $con);
