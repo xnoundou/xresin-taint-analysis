@@ -7,26 +7,30 @@ $desk = $_GET["table"];
 #print "Table is: " . $desk . '\n';
 
 // Check connection
-if (mysqli_connect_errno($con))
+if (mysqli_connect_errno())
 {
   echo "Failed to connect to MySQL: " . mysqli_connect_error() . '\n';
+  exit();
 }
 else  
 {
   $sql = "SELECT * FROM " . $desk . ";";
   
-  #print "Query to execute: " . $sql . "\n";
+  print "Query to execute: " . $sql . "\n";
 
-  //mysql_query($sql, $con);
-  $result = mysql_query($sql, $con);
+  $result = mysqli_query($con, $sql);
 
-  if (!$result) {
+  if ($result) {
+    printf("Select returned %d rows.\n", mysqli_num_rows($result));
+    mysqli_free_result($result);
+  }
+  else {
     echo "DB Error, could not query the database\n";
-    echo 'MySQL Error: ' . mysql_error();
+    echo 'MySQL Error: ' . mysqli_error($con) . "\n";
     exit;
   }
   
-  mysql_free_result($result);
+  mysqli_free_result($result);
 }
 
 echo "Now closing connection\n";
