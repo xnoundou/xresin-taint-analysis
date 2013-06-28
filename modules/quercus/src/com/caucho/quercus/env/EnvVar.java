@@ -48,6 +48,10 @@ abstract public class EnvVar
 		return _taintInfo;			
 	}
 	
+  public boolean isTainted() {
+  	return null != get() && get().isTainted() ;
+  } 
+	
   /**
    * Returns the current value.
    */

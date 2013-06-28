@@ -36,9 +36,12 @@ import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.QuercusClass;
 import com.caucho.quercus.env.Value;
 import com.caucho.quercus.function.AbstractFunction;
+import com.caucho.quercus.lib.string.StringModule;
 import com.caucho.util.L10N;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A "foo(...)" function call.
@@ -46,6 +49,8 @@ import java.util.ArrayList;
 public class CallExpr extends Expr {
   private static final L10N L = new L10N(CallExpr.class);
 
+  private static final Logger log = Logger.getLogger(CallExpr.class.getName());  
+  
   protected final StringValue _name;
   protected final StringValue _nsName;
   protected final Expr []_args;
@@ -171,6 +176,8 @@ public class CallExpr extends Expr {
   /**
    * Evaluates the expression.
    *
+   * ++ Taint Analysis
+   *
    * @param env the calling environment.
    *
    * @return the expression value.
@@ -202,6 +209,15 @@ public class CallExpr extends Expr {
 
     Value []args = evalArgs(env, _args);
 
+    for (Value arg: args) {
+    	if ( null != arg && arg.isTainted() ) {
+        log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
+    					  arg.toString().trim() + "' used as argument to function " +
+        		    fun.getName() + " . Tainted from " +
+    					  arg.getTaintInfo() + ". (CallExpr.evalImpl)" );     		
+    	}
+    }
+    
     env.pushCall(this, NullValue.NULL, args);
 
     // php/0249

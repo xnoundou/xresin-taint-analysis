@@ -64,6 +64,10 @@ public class Var extends Value
 
     checkVar(value);
   }
+  
+  public boolean isTainted() {
+  	return null != _value && _value.isTainted() ;
+  }  
 
   /**
    * Sets the value.
