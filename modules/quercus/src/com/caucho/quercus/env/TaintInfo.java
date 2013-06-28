@@ -47,12 +47,19 @@ public class TaintInfo {
 	}	
 	
 	Value _taintedVal;
+	
 	TaintSource _taintSrc = NOT_TAINTED;    
+	
 	PropagationType _propType = UNDEF;
 
 	public TaintInfo(Value taintedVal, TaintSource taintSrc) {              
 		_taintedVal = taintedVal;
 		_taintSrc = taintSrc;
+	}
+	
+	public TaintInfo copy() {
+		TaintInfo t = new TaintInfo( _taintedVal, _taintSrc );
+		return t;
 	}
 
 	public String toString() {

@@ -42,8 +42,6 @@ import java.util.logging.Logger;
  */
 public class EchoStatement extends Statement {
   protected final Expr _expr;
-
-  private static Logger log = Logger.getLogger(EchoStatement.class.getName());  
   
   /**
    * Creates the echo statement.
@@ -61,12 +59,6 @@ public class EchoStatement extends Statement {
 
     value.print(env);
     
-    if ( value.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
-          value.toString() + "' used in echo from " +
-          value.getTaintInfo());    	
-    }
-
     return null;
   }
 }

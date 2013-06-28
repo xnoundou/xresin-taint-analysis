@@ -1487,6 +1487,8 @@ public class StringModule extends AbstractQuercusModule {
 
   /**
    * Prints the string.
+   * 
+   * ++ Taint Analysis
    *
    * @param env the quercus environment
    * @param value the string to print
@@ -1495,6 +1497,12 @@ public class StringModule extends AbstractQuercusModule {
   {
     value.print(env);
 
+    if ( value.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
+      				value.toString().trim() + "' used. Tainted from " +
+         			value.getTaintInfo().toString() + ". (StringModule.print)" );    	
+    }
+    
     return 1;
   }
 

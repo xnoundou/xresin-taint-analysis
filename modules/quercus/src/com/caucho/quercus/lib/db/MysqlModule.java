@@ -621,9 +621,9 @@ public class MysqlModule extends AbstractQuercusModule {
       conn = getConnection(env);
     
     if ( null != sql && sql.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: using tainted query string '" +
-          		sql + "'. tainted from " +
-          		sql.getTaintInfo());     	
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
+          		sql.toString().trim() + "'used. Tainted from " +
+          		sql.getTaintInfo().toString() + ". (MysqlModule.mysql_query) " );     	
     }    
 
     return conn.query(env, sql, MYSQL_STORE_RESULT);
@@ -1016,10 +1016,10 @@ public class MysqlModule extends AbstractQuercusModule {
     if (conn == null)
       conn = getConnection(env);    
     
-    if ( null != query && query.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: using tainted query string '" +
-          		query + "'. tainted from " +
-          		query.getTaintInfo());     	
+    if ( null != query && query.isTainted() ) {  
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
+      				query.toString().trim() + "'used. Tainted from " +
+      				query.getTaintInfo().toString() + ". (MysqlModule.mysql_db_query)" );             
     }
     
     if (! conn.select_db(env, databaseName))

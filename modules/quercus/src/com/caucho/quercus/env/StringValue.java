@@ -954,12 +954,21 @@ abstract public class StringValue
    * Sets the array value, returning the new array, e.g. to handle
    * string update ($a[0] = 'A').  Creates an array automatically if
    * necessary.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value append(Value index, Value value)
-  {
-    if (length() == 0)
-      return new ArrayValueImpl().append(index, value);
+  {	
+    if (length() == 0) {
+      Value res = new ArrayValueImpl().append(index, value);
+      
+      if (value.isTainted())
+    	  res.setTaintInfo( value.getTaintInfo() );
+      
+      return res;
+    }
     else
       return this;
   }
@@ -1006,6 +1015,9 @@ abstract public class StringValue
 
   /**
    * Returns the character at an index
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value charValueAt(long index)
@@ -1015,7 +1027,11 @@ abstract public class StringValue
     if (index < 0 || len <= index)
       return UnsetUnicodeValue.UNSET;
     else {
-      return StringValue.create(charAt((int) index));
+      Value res = StringValue.create(charAt((int) index));
+      if ( this.isTainted() )
+    	  res.setTaintInfo( this.getTaintInfo() );
+      
+      return res;
     }
   }
 
@@ -1041,16 +1057,24 @@ abstract public class StringValue
 
   /**
    * Increment the following value.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value increment(int incr)
   {
     // php/03i6
     if (length() == 0) {
+      Value res = null;
       if (incr == 1)
-        return createStringBuilder().append("1");
+        res = createStringBuilder().append("1");
       else
-        return LongValue.MINUS_ONE;
+        res = LongValue.MINUS_ONE;
+      
+      res.setTaintInfo( this.getTaintInfo() );
+      
+      return res;
     }
 
     if (incr > 0) {
@@ -1060,38 +1084,61 @@ abstract public class StringValue
         char ch = charAt(i);
 
         if (ch == 'z') {
-          if (i == 0)
-            return createStringBuilder().append("aa").append(tail);
+          if (i == 0) {
+            StringValue res = createStringBuilder().append("aa").append(tail);
+            res.setTaintInfo( this.getTaintInfo() );
+            
+            return res;
+          }
           else
             tail.insert(0, 'a');
         }
         else if ('a' <= ch && ch < 'z') {
-          return (createStringBuilder()
+          StringValue res = (createStringBuilder()
                   .append(this, 0, i)
                   .append((char) (ch + 1))
                   .append(tail));
+          res.setTaintInfo( this.getTaintInfo() );
+          
+          return res;
         }
         else if (ch == 'Z') {
-          if (i == 0)
-            return createStringBuilder().append("AA").append(tail);
+          if (i == 0){
+            StringValue res = createStringBuilder().append("AA").append(tail);
+            res.setTaintInfo( this.getTaintInfo() );
+            
+            return res;
+          }
           else
             tail.insert(0, 'A');
         }
         else if ('A' <= ch && ch < 'Z') {
-          return (createStringBuilder()
+          StringValue res = (createStringBuilder()
                   .append(this, 0, i)
                   .append((char) (ch + 1))
                   .append(tail));
+          res.setTaintInfo( this.getTaintInfo() );
+          
+          return res;
         }
         else if ('0' <= ch && ch <= '9' && i == length() - 1) {
-          return LongValue.create(toLong() + incr);
+          LongValue res = LongValue.create(toLong() + incr);
+          res.setTaintInfo( this.getTaintInfo() );
+          
+          return res;
         }
       }
 
-      return createStringBuilder().append(tail.toString());
+      StringValue res = createStringBuilder().append(tail.toString());
+      res.setTaintInfo( this.getTaintInfo() );
+      
+      return res;
     }
     else if (getValueType().isLongAdd()) {
-      return LongValue.create(toLong() + incr);
+      LongValue res = LongValue.create(toLong() + incr);
+      res.setTaintInfo( this.getTaintInfo() );
+      
+      return res;
     }
     else {
       return this;
@@ -1100,32 +1147,55 @@ abstract public class StringValue
 
   /**
    * Adds to the following value.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public Value add(long rValue)
   {
+	Value res = null;
+	  
     if (getValueType().isLongAdd())
-      return LongValue.create(toLong() + rValue);
-
-    return DoubleValue.create(toDouble() + rValue);
+      res = LongValue.create(toLong() + rValue);
+    else
+      res = DoubleValue.create(toDouble() + rValue);
+    
+    res.setTaintInfo( this.getTaintInfo() );
+    
+    return res;   
   }
 
   /**
    * Adds to the following value.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public Value sub(long rValue)
   {
+	Value res = null;
+	
     if (getValueType().isLongAdd())
-      return LongValue.create(toLong() - rValue);
-
-    return DoubleValue.create(toDouble() - rValue);
+      res = LongValue.create(toLong() - rValue);
+    else
+      res = DoubleValue.create(toDouble() - rValue);
+    
+    res.setTaintInfo( this.getTaintInfo() );
+    
+    return res;
   }
 
   /*
    * Bit and.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value bitAnd(Value rValue)
   {
+	Value res = null;
+	
     if (rValue.isString()) {
       StringValue rStr = (StringValue) rValue;
 
@@ -1138,19 +1208,34 @@ abstract public class StringValue
 
         sb.appendByte(l & r);
       }
-
-      return sb;
+      
+      res = sb;
     }
     else
-      return LongValue.create(toLong() & rValue.toLong());
+      res = LongValue.create(toLong() & rValue.toLong());      
+    
+    if ( rValue.isTainted() ) {
+  	  res.setTaintInfo( TaintInfo.getTaintedInfoVAR( rValue ) );
+  	  res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+  	  res.setTaintInfo( this.getTaintInfo() );
+    }    
+    
+    return res;    
   }
 
   /*
    * Bit or.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value bitOr(Value rValue)
   {
+	Value res = null;
+	
     if (rValue.isString()) {
       StringValue rStr = (StringValue) rValue;
 
@@ -1169,18 +1254,33 @@ abstract public class StringValue
       else if (len != rStr.length())
         sb.append(rStr.substring(len));
 
-      return sb;
+      res = sb;
     }
     else
-      return LongValue.create(toLong() | rValue.toLong());
+      res = LongValue.create(toLong() | rValue.toLong());
+    
+    if ( rValue.isTainted() ) {
+      res.setTaintInfo( TaintInfo.getTaintedInfoVAR( rValue ) );
+      res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+      res.setTaintInfo( this.getTaintInfo() );
+    }     
+    
+    return res;
   }
 
   /*
    * Bit xor.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public Value bitXor(Value rValue)
   {
+	Value res = null;
+	
     if (rValue.isString()) {
       StringValue rStr = rValue.toStringValue();
 
@@ -1194,10 +1294,20 @@ abstract public class StringValue
         sb.appendByte(l ^ r);
       }
 
-      return sb;
+      res = sb;
     }
     else
-      return LongValue.create(toLong() ^ rValue.toLong());
+      res = LongValue.create(toLong() ^ rValue.toLong());
+    
+    if ( rValue.isTainted() ) {
+      res.setTaintInfo( TaintInfo.getTaintedInfoVAR( rValue ) );
+      res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+      res.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return res;
   }
 
   /**
@@ -1469,18 +1579,44 @@ abstract public class StringValue
 
   /**
    * Append a Java buffer to the value.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue append(StringBuilderValue sb, int head, int tail)
   {
-    return append((CharSequence) sb, head, tail);
+    StringValue res = append((CharSequence) sb, head, tail);
+    
+    if ( sb.isTainted() ) {
+      res.setTaintInfo( TaintInfo.getTaintedInfoVAR( sb ) );
+      res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+      res.setTaintInfo( this.getTaintInfo() );
+    }
+    
+    return res;
   }
 
   /**
    * Append a Java buffer to the value.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue append(UnicodeBuilderValue sb, int head, int tail)
   {
-    return append((CharSequence) sb, head, tail);
+    StringValue res = append((CharSequence) sb, head, tail);
+    
+    if ( sb.isTainted() ) {
+      res.setTaintInfo( TaintInfo.getTaintedInfoVAR( sb ) );
+      res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+      res.setTaintInfo( this.getTaintInfo() );
+    }   
+    
+    return res;
   }
 
   /*
@@ -1488,24 +1624,41 @@ abstract public class StringValue
    *
    * @param str should be a Unicode string
    * @param charset to decode string from
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue append(Env env, StringValue unicodeStr, String charset)
   {
-    if (! unicodeStr.isUnicode())
-      return append(unicodeStr);
+  	StringValue res = null;
+  	
+		if (! unicodeStr.isUnicode()) {
+			res = append(unicodeStr);
+		}
+		else {
+			
+			try {
+				byte[] bytes = unicodeStr.toString().getBytes(charset);
 
-    try {
-      byte []bytes = unicodeStr.toString().getBytes(charset);
+				append(bytes);
+				return this;
+			}
+			catch (UnsupportedEncodingException e) {
+				env.warning(e);
 
-      append(bytes);
-      return this;
-
+				res = append(unicodeStr);
+			}
+		}
+		
+    if ( unicodeStr.isTainted() ) {
+      res.setTaintInfo( TaintInfo.getTaintedInfoVAR( unicodeStr ) );
+      res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
     }
-    catch (UnsupportedEncodingException e) {
-      env.warning(e);
-
-      return append(unicodeStr);
-    }
+    else if ( this.isTainted() ) {
+      res.setTaintInfo( this.getTaintInfo() );
+    }		
+    
+    return res;
   }
 
   /**
@@ -1722,6 +1875,9 @@ abstract public class StringValue
 
   /**
    * Append a Java String to the value without conversions.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue appendBytes(StringValue s)
   {
@@ -1731,6 +1887,14 @@ abstract public class StringValue
       sb = sb.appendByte(s.charAt(i));
     }
 
+    if ( s.isTainted() ) {
+      sb.setTaintInfo( TaintInfo.getTaintedInfoVAR( s ) );
+      sb.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    else if ( this.isTainted() ) {
+      sb.setTaintInfo( this.getTaintInfo() );
+    }		
+    
     return sb;
   }
 
@@ -2284,18 +2448,32 @@ abstract public class StringValue
 
   /**
    * Returns a StringValue substring.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue substring(int head)
   {
-    return (StringValue) subSequence(head, length());
+    StringValue res = (StringValue) subSequence(head, length());
+    
+    res.setTaintInfo(this.getTaintInfo());
+    
+    return res;
   }
 
   /**
    * Returns a StringValue substring.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   public StringValue substring(int begin, int end)
   {
-    return (StringValue) subSequence(begin, end);
+  	StringValue res = (StringValue) subSequence(begin, end);
+  	
+    res.setTaintInfo(this.getTaintInfo());
+    
+    return res;        
   }
 
   /**

@@ -578,23 +578,39 @@ public class StringBuilderValue
 
   /**
    * Append to a string builder.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public StringValue appendTo(StringBuilderValue bb)
   {
     bb.append(_buffer, 0, _length);
 
+    if ( this.isTainted() ) {
+    	bb.setTaintInfo( this.getTaintInfoCopy() );
+    	bb.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    
     return bb;
   }
 
   /**
    * Append to a string builder.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public StringValue appendTo(UnicodeBuilderValue bb)
   {
     bb.append(_buffer, 0, _length);
 
+    if ( this.isTainted() ) {
+    	bb.setTaintInfo( this.getTaintInfoCopy() );
+    	bb.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }    
+    
     return bb;
   }
 
@@ -612,12 +628,20 @@ public class StringBuilderValue
 
   /**
    * Append to a string builder.
+   * 
+   * ++ Taint Analysis
+   * 
    */
   @Override
   public StringValue appendTo(BinaryBuilderValue bb)
   {
     bb.append(_buffer, 0, _length);
-
+        
+    if ( this.isTainted() ) {
+    	bb.setTaintInfo( this.getTaintInfoCopy() );
+    	bb.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }     
+    
     return bb;
   }
 
@@ -655,7 +679,11 @@ public class StringBuilderValue
         return this;
     }
 
-    return LongValue.create(sign * value);
+    Value res =  LongValue.create(sign * value);
+    
+    res.setTaintInfo( this.getTaintInfoCopy() );
+    
+    return res;
   }
 
   /**

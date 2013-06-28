@@ -45,11 +45,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.caucho.quercus.QuercusException;
 import com.caucho.quercus.QuercusRuntimeException;
 import com.caucho.quercus.function.AbstractFunction;
 import com.caucho.quercus.marshal.Marshal;
+import com.caucho.quercus.statement.EchoStatement;
 import com.caucho.util.L10N;
 import com.caucho.vfs.WriteStream;
 
@@ -69,12 +72,21 @@ abstract public class Value implements java.io.Serializable
   //
   // Properties
   //
+  
+  private static Logger log = Logger.getLogger(Value.class.getName());
 
   protected TaintInfo _taintInfo = null;
   
   public TaintInfo getTaintInfo() {
     return _taintInfo;
   }
+  
+  public TaintInfo getTaintInfoCopy() {
+    if ( null != _taintInfo )
+    	return _taintInfo.copy();
+    
+    return null;
+  }  
   
   public void setTaintInfo(TaintInfo taintInfo) {
   	_taintInfo = taintInfo;
@@ -1287,7 +1299,15 @@ abstract public class Value implements java.io.Serializable
    */
   public StringValue appendTo(StringBuilderValue sb)
   {
-    return sb.append(toString());
+    StringValue res = sb.append(toString());
+    
+    if ( this.isTainted() )
+    {
+    	res.setTaintInfo( this.getTaintInfoCopy() );
+    	res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }
+    
+    return res;
   }
 
   /**
@@ -1295,7 +1315,15 @@ abstract public class Value implements java.io.Serializable
    */
   public StringValue appendTo(BinaryBuilderValue sb)
   {
-    return sb.appendBytes(toString());
+    StringValue res = sb.appendBytes(toString());
+    
+    if ( this.isTainted() )
+    {
+    	res.setTaintInfo( this.getTaintInfoCopy() );
+    	res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }    
+    
+    return res;    
   }
 
   /**
@@ -1303,7 +1331,15 @@ abstract public class Value implements java.io.Serializable
    */
   public StringValue appendTo(LargeStringBuilderValue sb)
   {
-    return sb.append(toString());
+    StringValue res = sb.append(toString());
+        
+    if ( this.isTainted() )
+    {
+    	res.setTaintInfo( this.getTaintInfoCopy() );
+    	res.getTaintInfo().setPropagationType( TaintInfo.PropagationType.OP_COPY );
+    }    
+    
+    return res;    
   }
 
   /**
@@ -3043,12 +3079,23 @@ abstract public class Value implements java.io.Serializable
 
   /**
    * Prints the value.
+   * 
+   * ++ Taint Analysis
+   * 
    * @param env
    */
   public void print(Env env, WriteStream out)
   {
     try {
-      out.print(toString(env));
+    	
+    	StringValue prtStr = toString(env);
+      if ( this.isTainted() ) {
+        log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
+        				prtStr.toString().trim() + "' used. Tainted from " +
+           			getTaintInfo().toString() + ". (Value.print)" );    	
+      }
+    	
+      out.print(prtStr);
     } catch (IOException e) {
       throw new QuercusRuntimeException(e);
     }

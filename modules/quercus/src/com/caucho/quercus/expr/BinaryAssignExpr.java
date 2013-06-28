@@ -87,11 +87,7 @@ public class BinaryAssignExpr extends Expr {
   @Override
   public Value eval(Env env)
   {
-  	Value retVal = _var.evalAssignValue(env, _value); 
-  	
-    if ( null != _value && _value.isTainted() ) {
-    	copyAndSetTaintInfo(_value);
-    }
+  	Value retVal = _var.evalAssignValue(env, _value);   	
     
     return retVal;
   }
