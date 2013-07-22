@@ -3070,11 +3070,21 @@ abstract public class Value implements java.io.Serializable
 
   /**
    * Prints the value.
+   * 
+   * ++ Taint Analysis
+   * 
    * @param env
    */
   public void print(Env env)
   {
-    env.print(toString(env));
+  	StringValue prtStr = toString(env);
+  	
+    if ( this.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
+      				prtStr.toString() + "' used. Tainted from " +
+         			getTaintInfo() + ". (Value.print(Env))" );    	
+    }  	
+    env.print(prtStr);
   }
 
   /**
@@ -3091,8 +3101,8 @@ abstract public class Value implements java.io.Serializable
     	StringValue prtStr = toString(env);
       if ( this.isTainted() ) {
         log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
-        				prtStr.toString().trim() + "' used. Tainted from " +
-           			getTaintInfo().toString() + ". (Value.print)" );    	
+        				prtStr.toString() + "' used. Tainted from " +
+           			getTaintInfo() + ". (Value.print(Env, WriteStream))" );    	
       }
     	
       out.print(prtStr);
@@ -3303,7 +3313,16 @@ abstract public class Value implements java.io.Serializable
                             IdentityHashMap<Value, String> valueSet)
     throws IOException
   {
-    out.print(toString());
+  	
+  	String prtStr = toString();
+    
+  	if ( this.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
+      				prtStr + "' used. Tainted from " +
+         			getTaintInfo().toString() + ". (Value.print)" );    	
+    }  	
+  	
+    out.print(prtStr);
   }
 
   protected void printDepth(WriteStream out, int depth)

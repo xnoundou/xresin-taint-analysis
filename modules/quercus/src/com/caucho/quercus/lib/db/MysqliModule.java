@@ -929,8 +929,6 @@ public class MysqliModule extends AbstractQuercusModule {
   /**
    * Executes a query and returns the result.
    *
-   * ++ Taint Analysis
-   *
    */
   public static Value mysqli_query(Env env,
                                    @NotNull Mysqli conn,
@@ -939,12 +937,6 @@ public class MysqliModule extends AbstractQuercusModule {
     // ERRATUM: <i>resultMode</i> is ignored, MYSQLI_USE_RESULT would represent
     //  an unbuffered query, but that is not supported.
 
-    if ( null != sql && sql.isTainted() ) {  
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
-      				sql.toString().trim() + "'used. Tainted from " +
-      				sql.getTaintInfo().toString() + ". (MysqliModule.mysqli_query)" );             
-    }  	
-  	
     Value value = query(env, conn, sql);
 
     if (value == null) {

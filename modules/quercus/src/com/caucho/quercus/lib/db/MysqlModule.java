@@ -610,8 +610,6 @@ public class MysqlModule extends AbstractQuercusModule {
    *
    * Returns true on update success, false on failure, and a result set
    * for a successful select
-   * 
-   * ++ Taint Analysis	
    */
   public static Value mysql_query(Env env,
                                   StringValue sql,
@@ -619,12 +617,6 @@ public class MysqlModule extends AbstractQuercusModule {
   {
     if (conn == null)
       conn = getConnection(env);
-    
-    if ( null != sql && sql.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
-          		sql.toString().trim() + "'used. Tainted from " +
-          		sql.getTaintInfo().toString() + ". (MysqlModule.mysql_query) " );     	
-    }    
 
     return conn.query(env, sql, MYSQL_STORE_RESULT);
   }
@@ -1006,7 +998,6 @@ public class MysqlModule extends AbstractQuercusModule {
 
   /**
    * Returns result set or false on error
-   * ++ Taint Analysis
    */
   public static Value mysql_db_query(Env env,
                                      String databaseName,
@@ -1014,14 +1005,8 @@ public class MysqlModule extends AbstractQuercusModule {
                                      @Optional Mysqli conn)
   {
     if (conn == null)
-      conn = getConnection(env);    
-    
-    if ( null != query && query.isTainted() ) {  
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: '" +
-      				query.toString().trim() + "'used. Tainted from " +
-      				query.getTaintInfo().toString() + ". (MysqlModule.mysql_db_query)" );             
-    }
-    
+      conn = getConnection(env);
+
     if (! conn.select_db(env, databaseName))
       return BooleanValue.FALSE;
 

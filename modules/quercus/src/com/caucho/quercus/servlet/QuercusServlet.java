@@ -36,6 +36,7 @@ import com.caucho.quercus.lib.db.QuercusDataSource;
 import com.caucho.quercus.module.QuercusModule;
 import com.caucho.util.CurrentTime;
 import com.caucho.util.L10N;
+import com.caucho.vfs.FilePath;
 import com.caucho.vfs.Path;
 
 import javax.naming.Context;
@@ -91,6 +92,8 @@ public class QuercusServlet
   private String _phpVersion;
 
   private File _licenseDirectory;
+  
+  private File _taintSinkFile;
 
   private Long _dependencyCheckInterval;
 
@@ -384,7 +387,24 @@ public class QuercusServlet
 
     _licenseDirectory = new File(relPath);
   }
+  
+  /**
+   * Sets the file where sink functions for taint analysis are declared.
+   */
+  public void setSinkFunction(String relPath)
+  {
+    if (relPath.startsWith("/") || relPath.contains(":")) {
+    }
+    else {
+      relPath = getServletContext().getRealPath(relPath);
+    }
 
+    _taintSinkFile = new File(relPath);   
+    
+    log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sink functions in : " + _taintSinkFile);
+  }
+  
+  
   /**
    * Initializes the servlet.
    */
@@ -400,9 +420,9 @@ public class QuercusServlet
       String paramName = paramNames.nextElement();
       String paramValue = config.getInitParameter(paramName);
 
-      setInitParam(paramName, paramValue);
-    }
-
+      setInitParam(paramName, paramValue);     
+    }  
+    
     initImpl(config);
   }
 
@@ -454,9 +474,12 @@ public class QuercusServlet
     else if ("dependency-check-interval".equals(paramName)) {
       setDependencyCheckInterval(Long.parseLong(paramValue));
     }
-    else if ("license-directory".equals(paramName)) {
+    else if ("license-directory".equals(paramName)) { 
       setLicenseDirectory(paramValue);
     }
+    else if ("taint-sink".equals(paramName)) { //TAINT ANALYSIS
+      setSinkFunction(paramValue);      
+    }    
     else {
       throw new ServletException(L.l("'{0}' is not a recognized init-param", paramName));
     }
@@ -516,6 +539,7 @@ public class QuercusServlet
     quercus.setPageCacheSize(_pageCacheSize);
     quercus.setRegexpCacheSize(_regexpCacheSize);
     quercus.setConnectionPool(_isConnectionPool);
+    quercus.setTaintSinkFile(_taintSinkFile); //TAINT ANALYSIS
 
     if (_dependencyCheckInterval != null) {
       quercus.setDependencyCheckInterval(_dependencyCheckInterval);

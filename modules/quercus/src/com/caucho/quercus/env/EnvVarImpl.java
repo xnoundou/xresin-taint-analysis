@@ -50,7 +50,12 @@ public final class EnvVarImpl extends EnvVar
    */
   public Value get()
   {
-    return _var.toValue();
+  	Value v = _var.toValue(); 
+  	
+  	if ( this.isTainted() && null != v )
+  		v.setTaintInfo( this.getTaintInfo() );
+  	
+    return v;
   }
 
   /**
@@ -66,6 +71,9 @@ public final class EnvVarImpl extends EnvVar
    */
   public Var getVar()
   {
+  	if ( this.isTainted() && null != _var )
+  		_var.setTaintInfo( this.getTaintInfo() );  	
+  	
     return _var;
   }
 

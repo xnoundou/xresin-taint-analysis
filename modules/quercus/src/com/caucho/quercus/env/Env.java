@@ -947,6 +947,16 @@ public class Env
   {
     return _quercus.getServletContext();
   }
+  
+  /**
+   * TAINT ANALYSIS
+   * 
+   * Returns the ServletContext.
+   */
+  public boolean isTaintSinkFunction(String aFuncName)
+  {
+    return _quercus.isTaintSinkFunction(aFuncName);
+  }  
 
   /**
    * Sets the ScriptContext.

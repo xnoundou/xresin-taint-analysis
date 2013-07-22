@@ -1,0 +1,44 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+     	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	   		     http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	 version="2.5">
+  
+  <servlet>
+    <servlet-name>Quercus Servlet</servlet-name>
+    <servlet-class>com.caucho.quercus.servlet.QuercusServlet</servlet-class>
+
+    <!-- Specifies the file where sink functions for the taint analysis
+	 are declared. -->
+    <init-param>
+      <param-name>taint-sink</param-name>
+      <param-value>WEB-INF/ta-sink.txt</param-value>
+    </init-param>
+
+    <!--
+    <init-param>
+      <param-name>ini-file</param-name>
+      <param-value>WEB-INF/php.ini</param-value>
+    </init-param>
+    -->
+    
+    <!--
+      Location of the license to enable php to java compilation.
+    -->
+    <init-param>
+      <param-name>license-directory</param-name>
+      <param-value>WEB-INF/licenses</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Quercus Servlet</servlet-name> 
+    <url-pattern>*.php</url-pattern>
+    <!--<init>
+      <php-ini>
+        <short_open_tag>on</short_open_tag>
+	<error_reporting>'E_WARNING &#x26; ~E_NOTICE &#x26; ~E_DEPRECATED</error_reporting>
+      </php-ini>
+    </init>-->
+  </servlet-mapping>
+</web-app>

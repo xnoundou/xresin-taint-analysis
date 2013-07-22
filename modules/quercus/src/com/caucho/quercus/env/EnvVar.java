@@ -49,7 +49,7 @@ abstract public class EnvVar
 	}
 	
   public boolean isTainted() {
-  	return null != get() && get().isTainted() ;
+  	return _taintInfo != null ;
   } 
 	
   /**

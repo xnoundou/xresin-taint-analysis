@@ -29,7 +29,11 @@
 
 package com.caucho.quercus;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -169,6 +173,8 @@ public class QuercusContext
   private String []_classNames = new String[256];
   private ClassDef []_classDefMap = new ClassDef[256];
   private QuercusClass []_classCacheMap = new QuercusClass[256];
+  
+  private ArrayList<String> _sinkFunctions = new ArrayList<String>();
 
   private IntMap _constantNameMap = new IntMap(8192);
   private int []_constantLowerMap = new int[256];
@@ -244,6 +250,9 @@ public class QuercusContext
   private JdbcDriverContext _jdbcDriverContext;
 
   private Boolean _isUnicodeSemantics;
+  
+  //TAINT ANALYSIS
+  private File _taintSinkFile;
 
   /**
    * Constructor.
@@ -627,6 +636,34 @@ public class QuercusContext
     return _servletContext;
   }
 
+  public File getTaintSinkFile() {
+  	return _taintSinkFile;
+  }  
+  
+  public void setTaintSinkFile(File taintSinkFile) {
+  	_taintSinkFile = taintSinkFile;
+  	if (null != _taintSinkFile) {
+  		try {
+  			BufferedReader br = new BufferedReader( new FileReader(_taintSinkFile) );
+  			String nextLine = br.readLine();
+  			while( null != nextLine ) {
+  				_sinkFunctions.add( nextLine.trim() );
+  				nextLine = br.readLine();
+  			}
+  		}
+  		catch(FileNotFoundException e) {
+  			log.log(Level.INFO, "[TAINT ANALYSIS] Could not find sink functions file");
+  		}
+  		catch(IOException e) {
+  			log.log(Level.INFO, "[TAINT ANALYSIS] \n" + e.getMessage(), e);
+  		}  		
+  	}
+  }
+  
+  public boolean isTaintSinkFunction(String aFuncName) {
+  	return _sinkFunctions.contains( aFuncName );
+  }
+  
   /**
    * Sets the default data source.
    */
@@ -1989,8 +2026,8 @@ public class QuercusContext
 
       _classDefMap[id] = def;
     }
-  }
-
+  }  
+  
   /**
    * Creates a string.  Because these strings are typically Java
    * constants, they fit into a lru cache.
