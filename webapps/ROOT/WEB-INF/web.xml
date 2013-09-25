@@ -12,7 +12,7 @@
 	 are declared. -->
     <init-param>
       <param-name>taint-sink</param-name>
-      <param-value>WEB-INF/ta-sink.txt</param-value>
+      <param-value>WEB-INF/ta-sink.cfg</param-value>
     </init-param>
 
     <!--
