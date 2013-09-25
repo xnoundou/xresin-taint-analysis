@@ -212,8 +212,8 @@ public class CallExpr extends Expr {
     if ( env.isTaintSinkFunction(_name.toString()) ) {
     	for (Value arg: args) {
     		if ( null != arg && arg.isTainted() ) {
-    			log.log(Level.WARNING, "[TAINT ANALYSIS][CallExpr.evalImpl]: tainted argument '" +
-    					arg.toString() + "'  used to call sink function " + fun.getName() + ". Tainted from " +
+    			log.log(Level.WARNING, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
+    					arg.toString() + "' used to call sink function " + fun.getName() + ". Tainted from " +
     					arg.getTaintInfo() + "." );     		
     		}
     	}

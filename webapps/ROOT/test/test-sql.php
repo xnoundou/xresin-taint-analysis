@@ -4,6 +4,8 @@
 
 $desk = $_GET["table"];
 
+echo "Here is the name: " . $_POST["fname"] . '\n'
+
 #print "Table is: " . $desk . '\n';
 
 // Check connection

@@ -33,6 +33,7 @@ import com.caucho.util.CharBuffer;
 import com.caucho.vfs.TempCharBuffer;
 import com.caucho.vfs.WriteStream;
 import com.caucho.quercus.QuercusModuleException;
+import com.caucho.quercus.expr.CallExpr;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.IdentityHashMap;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 /**
@@ -50,6 +53,8 @@ import java.util.zip.CRC32;
 public class StringBuilderValue
   extends BinaryValue
 {
+	private static final Logger log = Logger.getLogger(StringBuilderValue.class.getName()); 
+	
   public static final StringBuilderValue EMPTY = new ConstStringValue("");
 
   private static final StringBuilderValue []CHAR_STRINGS;
@@ -1665,11 +1670,18 @@ public class StringBuilderValue
 
   /**
    * Prints the value.
+   * 
+   * ++ Taint Analysis
+   * 
    * @param env
    */
   public void print(Env env)
-  {
+  {  	
     env.write(_buffer, 0, _length);
+    if ( this.isTainted() ) {
+    	log.log(Level.WARNING, "[TAINT ANALYSIS][StringBuilderValue.print]: '" + 
+    					getValue().trim() + "' used. Tainted from " + this.getTaintInfo().toString());
+    }
   }
 
   /**
