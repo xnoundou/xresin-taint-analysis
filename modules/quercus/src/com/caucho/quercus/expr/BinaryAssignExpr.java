@@ -41,7 +41,6 @@ public class BinaryAssignExpr extends Expr {
   protected final AbstractVarExpr _var;
   protected final Expr _value;
 
-  //++ Taint Analysis
   public BinaryAssignExpr(Location location, AbstractVarExpr var, Expr value)
   {
     super(location);
@@ -50,7 +49,6 @@ public class BinaryAssignExpr extends Expr {
     _value = value;    
   }
 
-  //++ Taint Analysis
   public BinaryAssignExpr(AbstractVarExpr var, Expr value)
   {
     _var = var;
