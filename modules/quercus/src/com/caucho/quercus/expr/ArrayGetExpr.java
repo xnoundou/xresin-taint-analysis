@@ -92,6 +92,8 @@ public class ArrayGetExpr extends AbstractVarExpr {
   /**
    * Evaluates the expression.
    *
+   * ++ Taint Analysis
+   *
    * @param env the calling environment.
    *
    * @return the expression value.
@@ -116,6 +118,8 @@ public class ArrayGetExpr extends AbstractVarExpr {
 
   /**
    * Evaluates the expression as a copyable result.
+   *
+   * 	++ Taint Analysis
    *
    * @param env the calling environment.
    *
