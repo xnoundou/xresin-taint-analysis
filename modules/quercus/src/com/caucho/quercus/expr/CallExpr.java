@@ -31,6 +31,7 @@ package com.caucho.quercus.expr;
 
 import com.caucho.quercus.Location;
 import com.caucho.quercus.env.Env;
+import com.caucho.quercus.env.EnvVar;
 import com.caucho.quercus.env.NullValue;
 import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.QuercusClass;
@@ -220,6 +221,29 @@ public class CallExpr extends Expr {
     }
     
     env.pushCall(this, NullValue.NULL, args);
+    
+    if ( env.isTaintSanitizerFunction(_name.toString()) ) {
+    	
+    	//PHP sanitizer function generally takes the string to 
+    	//sanitize as first argument.
+      for (int k=0; k < 1; ++k) {
+      	Value arg = args[k];
+    		if ( null != arg && arg.isTainted() ) {    			    
+    			EnvVar argVar = env.getGlobalEnvVar(arg.toStringValue(),
+              																false, /*do not auto create*/
+              																false /*no outputNotice*/
+              																);
+    			if (null != argVar) {
+    				argVar.setTaintInfo(null);    			
+      			log.log(Level.INFO, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
+      					arg.toString() + "', tainted from " + arg.getTaintInfo() +
+      					" has been sanitized by " + fun.getName() + "." );    				
+    			}
+    			
+    		}
+    	}
+    }    
+    
 
     // php/0249
     QuercusClass oldCallingClass = env.setCallingClass(null);

@@ -4,8 +4,12 @@ $con=mysqli_connect("localhost","pepsi","cola","test");
 
 $desk = $_GET["table"];
 
-echo "Entered Name: " . $_POST["fname"] . "\n"
-echo "Entered Age: " . $_POST["age"] . "\n"
+#echo "Entered Name: " . $_POST["fname"] . "\n";
+#echo "Entered Age: " . $_POST["age"] . "\n";
+
+$k = 0;
+$k += $_POST["age"];
+printf("Here is the value of k: %d\n", $k);
 
 // Check connection
 if (mysqli_connect_errno()) {
@@ -13,8 +17,14 @@ if (mysqli_connect_errno()) {
   exit();
 }
 else {
+  //Before sanitization
+  $sql2 = "SELECT * FROM " . $desk . ";";
+  $result = mysqli_query($con, $sql2);
+  
+  $desk = mysql_real_escape_string($desk);
   $sql = "SELECT * FROM " . $desk . ";";
-  #print "Query to execute: " . $sql . "\n";
+
+  //Again, after sanitization
   $result = mysqli_query($con, $sql);
 
   if ($result) {

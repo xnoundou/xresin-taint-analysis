@@ -75,12 +75,21 @@ abstract public class Value implements java.io.Serializable
   
   private static Logger log = Logger.getLogger(Value.class.getName());
 
+  /*
+   * ++ Taint Analysis
+   */  
   protected TaintInfo _taintInfo = null;
   
+  /*
+   * ++ Taint Analysis
+   */  
   public TaintInfo getTaintInfo() {
     return _taintInfo;
   }
   
+  /*
+   * ++ Taint Analysis
+   */  
   public TaintInfo getTaintInfoCopy() {
     if ( null != _taintInfo )
     	return _taintInfo.copy();
@@ -88,10 +97,23 @@ abstract public class Value implements java.io.Serializable
     return null;
   }  
   
+  /*
+   * ++ Taint Analysis
+   */
   public void setTaintInfo(TaintInfo taintInfo) {
   	_taintInfo = taintInfo;
+  	
+  	if ( null != _taintInfo && ! _taintInfo.eq(taintInfo) ) {
+  		//The value has become tainted, we create a new PHP statement
+  		//to log this into the firebug console
+  		
+  	}
+  	
   }
   
+  /*
+   * ++ Taint Analysis
+   */  
   public boolean isTainted() {
   	return null != _taintInfo;
   }

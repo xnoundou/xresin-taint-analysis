@@ -93,7 +93,11 @@ public class QuercusServlet
 
   private File _licenseDirectory;
   
+  /*
+   * ++ Taint Analysis
+   */
   private File _taintSinkFile;
+  private File _taintSanitizerFile;
 
   private Long _dependencyCheckInterval;
 
@@ -389,6 +393,7 @@ public class QuercusServlet
   }
   
   /**
+   * ++ Taint Analysis
    * Sets the file where sink functions for taint analysis are declared.
    */
   public void setSinkFunction(String relPath)
@@ -404,6 +409,22 @@ public class QuercusServlet
     log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sink functions in : " + _taintSinkFile);
   }
   
+  /**
+   * ++ Taint Analysis
+   * Sets the file where santizer functions for taint analysis are declared.
+   */
+  public void setSanitizerFunction(String relPath)
+  {
+    if (relPath.startsWith("/") || relPath.contains(":")) {
+    }
+    else {
+      relPath = getServletContext().getRealPath(relPath);
+    }
+
+    _taintSanitizerFile = new File(relPath);   
+    
+    log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sanitizer functions in : " + _taintSanitizerFile);
+  }  
   
   /**
    * Initializes the servlet.
@@ -477,9 +498,12 @@ public class QuercusServlet
     else if ("license-directory".equals(paramName)) { 
       setLicenseDirectory(paramValue);
     }
-    else if ("taint-sink".equals(paramName)) { //TAINT ANALYSIS
+    else if ("taint-sink".equals(paramName)) { //Taint Analysis
       setSinkFunction(paramValue);      
     }    
+    else if ("taint-sanitizer".equals(paramName)) { //Taint Analysis
+      setSanitizerFunction(paramValue);      
+    } 
     else {
       throw new ServletException(L.l("'{0}' is not a recognized init-param", paramName));
     }
@@ -539,7 +563,8 @@ public class QuercusServlet
     quercus.setPageCacheSize(_pageCacheSize);
     quercus.setRegexpCacheSize(_regexpCacheSize);
     quercus.setConnectionPool(_isConnectionPool);
-    quercus.setTaintSinkFile(_taintSinkFile); //TAINT ANALYSIS
+    quercus.setTaintSinkFile(_taintSinkFile); //Taint Analysis
+    quercus.setTaintSanitizerFile(_taintSanitizerFile); //Taint Analysis
 
     if (_dependencyCheckInterval != null) {
       quercus.setDependencyCheckInterval(_dependencyCheckInterval);

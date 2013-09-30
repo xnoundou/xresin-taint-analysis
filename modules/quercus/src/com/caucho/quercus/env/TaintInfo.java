@@ -61,7 +61,18 @@ public class TaintInfo {
 		TaintInfo t = new TaintInfo( _taintedVal, _taintSrc );
 		return t;
 	}
+	
+	public boolean isDefined() {
+		return _propType != UNDEF;
+	}
 
+	public boolean eq(TaintInfo taint) {
+		return null != taint &&					
+					_taintSrc == taint._taintSrc &&			
+				  null != _taintedVal && null != taint._taintedVal &&
+				  _taintedVal.eq( taint._taintedVal );				  
+	}
+	
 	public String toString() {
 		StringBuilder res = new StringBuilder("");
 

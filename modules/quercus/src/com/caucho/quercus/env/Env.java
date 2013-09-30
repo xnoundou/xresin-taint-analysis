@@ -949,13 +949,23 @@ public class Env
   }
   
   /**
-   * TAINT ANALYSIS
+   * ++ Taint Analysis
    * 
-   * Returns the ServletContext.
+   * Returns true if "aFuncName" is a sink function.
    */
   public boolean isTaintSinkFunction(String aFuncName)
   {
     return _quercus.isTaintSinkFunction(aFuncName);
+  } 
+  
+  /**
+   * ++ Taint Analysis
+   * 
+   * Returns true if "aFuncName" is a sanitizer function.
+   */
+  public boolean isTaintSanitizerFunction(String aFuncName)
+  {
+    return _quercus.isTaintSanitizerFunction(aFuncName);
   }  
 
   /**

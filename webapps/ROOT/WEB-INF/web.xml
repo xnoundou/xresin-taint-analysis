@@ -14,6 +14,14 @@
       <param-name>taint-sink</param-name>
       <param-value>WEB-INF/ta-sink.cfg</param-value>
     </init-param>
+    
+
+    <!-- Specifies the configuration file for sanitizer functions
+	 for the taint analysis. -->
+    <init-param>
+      <param-name>taint-sanitizer</param-name>
+      <param-value>WEB-INF/ta-sanitizer.cfg</param-value>
+    </init-param>
 
     <!--
     <init-param>

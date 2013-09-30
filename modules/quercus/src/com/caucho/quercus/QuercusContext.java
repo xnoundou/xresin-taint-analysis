@@ -173,8 +173,6 @@ public class QuercusContext
   private String []_classNames = new String[256];
   private ClassDef []_classDefMap = new ClassDef[256];
   private QuercusClass []_classCacheMap = new QuercusClass[256];
-  
-  private ArrayList<String> _sinkFunctions = new ArrayList<String>();
 
   private IntMap _constantNameMap = new IntMap(8192);
   private int []_constantLowerMap = new int[256];
@@ -251,9 +249,15 @@ public class QuercusContext
 
   private Boolean _isUnicodeSemantics;
   
-  //TAINT ANALYSIS
+  /*
+   * ++ Taint Analysis
+   */
   private File _taintSinkFile;
-
+  private ArrayList<String> _sinkFunctions = new ArrayList<String>();
+    
+  private File _taintSanitizerFile;
+  private ArrayList<String> _sanitizerFunctions = new ArrayList<String>();
+  
   /**
    * Constructor.
    */
@@ -640,6 +644,9 @@ public class QuercusContext
   	return _taintSinkFile;
   }  
   
+  /*
+   * ++ Taint Analysis
+   */
   public void setTaintSinkFile(File taintSinkFile) {
   	_taintSinkFile = taintSinkFile;
   	if (null != _taintSinkFile) {
@@ -660,9 +667,42 @@ public class QuercusContext
   	}
   }
   
+  /*
+   * ++ Taint Analysis
+   */
+  public void setTaintSanitizerFile(File taintSanitizerFile) {
+  	_taintSanitizerFile = taintSanitizerFile;
+  	if (null != taintSanitizerFile) {
+  		try {
+  			BufferedReader br = new BufferedReader( new FileReader(taintSanitizerFile) );
+  			String nextLine = br.readLine();
+  			while( null != nextLine ) {
+  				_sanitizerFunctions.add( nextLine.trim() );
+  				nextLine = br.readLine();
+  			}
+  		}
+  		catch(FileNotFoundException e) {
+  			log.log(Level.INFO, "[TAINT ANALYSIS] Could not find sanitizer functions file");
+  		}
+  		catch(IOException e) {
+  			log.log(Level.INFO, "[TAINT ANALYSIS] \n" + e.getMessage(), e);
+  		}  		
+  	}
+  }  
+  
+  /*
+   * ++ Taint Analysis
+   */
   public boolean isTaintSinkFunction(String aFuncName) {
   	return _sinkFunctions.contains( aFuncName );
   }
+  
+  /*
+   * ++ Taint Analysis
+   */
+  public boolean isTaintSanitizerFunction(String aFuncName) {
+  	return _sanitizerFunctions.contains( aFuncName );
+  }  
   
   /**
    * Sets the default data source.
