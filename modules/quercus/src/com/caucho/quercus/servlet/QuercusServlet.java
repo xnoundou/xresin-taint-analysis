@@ -96,9 +96,12 @@ public class QuercusServlet
   /*
    * ++ Taint Analysis
    */
+  private boolean _runTaintAnalysis = false;
   private File _taintSinkFile;
   private File _taintSanitizerFile;
 
+  private static final String TAINT_ANALYSIS_ON = "on";
+  
   private Long _dependencyCheckInterval;
 
   private ArrayList<QuercusModule> _moduleList
@@ -390,7 +393,17 @@ public class QuercusServlet
     }
 
     _licenseDirectory = new File(relPath);
-  }
+  }  
+  
+  /**
+   * ++ Taint Analysis
+   * Sets variable '_runTaintAnalysis' which specifies if
+   * the taint analysis should run
+   */
+  public void setTaintAnalysis(boolean runTaintAnalysis)
+  {
+    _runTaintAnalysis = runTaintAnalysis;     
+  }  
   
   /**
    * ++ Taint Analysis
@@ -405,8 +418,6 @@ public class QuercusServlet
     }
 
     _taintSinkFile = new File(relPath);   
-    
-    log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sink functions in : " + _taintSinkFile);
   }
   
   /**
@@ -421,13 +432,13 @@ public class QuercusServlet
       relPath = getServletContext().getRealPath(relPath);
     }
 
-    _taintSanitizerFile = new File(relPath);   
-    
-    log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sanitizer functions in : " + _taintSanitizerFile);
+    _taintSanitizerFile = new File(relPath);     
   }  
   
   /**
    * Initializes the servlet.
+   * 
+   * ++ Taint Analysis
    */
   @Override
   public void init(ServletConfig config)
@@ -443,6 +454,14 @@ public class QuercusServlet
 
       setInitParam(paramName, paramValue);     
     }  
+    
+    String msg = _runTaintAnalysis ? "ON" : "OFF"; 
+    log.log(Level.INFO, "[TAINT ANALYSIS] Taint analysis is " + msg);
+    
+    if(_runTaintAnalysis) {      
+      log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sink functions in : " + _taintSinkFile);   	
+      log.log(Level.INFO, "[TAINT ANALYSIS] taint analysis sanitizer functions in : " + _taintSanitizerFile);
+    }
     
     initImpl(config);
   }
@@ -497,16 +516,20 @@ public class QuercusServlet
     }
     else if ("license-directory".equals(paramName)) { 
       setLicenseDirectory(paramValue);
-    }
-    else if ("taint-sink".equals(paramName)) { //Taint Analysis
+    }    
+    else if ("taint-sink".equals(paramName)) { //++ Taint Analysis
       setSinkFunction(paramValue);      
     }    
-    else if ("taint-sanitizer".equals(paramName)) { //Taint Analysis
+    else if ("taint-sanitizer".equals(paramName)) { //++ Taint Analysis
       setSanitizerFunction(paramValue);      
-    } 
+    }
+    else if ("run-taint-analysis".equals(paramName)) { //++ Taint Analysis    
+    	if ( null != paramValue && paramValue.equalsIgnoreCase(TAINT_ANALYSIS_ON))
+    		setTaintAnalysis(true);
+    }     
     else {
       throw new ServletException(L.l("'{0}' is not a recognized init-param", paramName));
-    }
+    }      
   }
 
   private void setJndiDatabase(String value)
@@ -563,8 +586,13 @@ public class QuercusServlet
     quercus.setPageCacheSize(_pageCacheSize);
     quercus.setRegexpCacheSize(_regexpCacheSize);
     quercus.setConnectionPool(_isConnectionPool);
-    quercus.setTaintSinkFile(_taintSinkFile); //Taint Analysis
-    quercus.setTaintSanitizerFile(_taintSanitizerFile); //Taint Analysis
+    quercus.setTaintAnalysis(_runTaintAnalysis); //++ Taint Analysis
+    
+    //++ Taint Analysis
+    if ( _runTaintAnalysis ) {
+    	quercus.setTaintSinkFile(_taintSinkFile);
+    	quercus.setTaintSanitizerFile(_taintSanitizerFile);
+    }
 
     if (_dependencyCheckInterval != null) {
       quercus.setDependencyCheckInterval(_dependencyCheckInterval);

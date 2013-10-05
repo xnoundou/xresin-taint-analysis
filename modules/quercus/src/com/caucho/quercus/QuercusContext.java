@@ -258,6 +258,8 @@ public class QuercusContext
   private File _taintSanitizerFile;
   private ArrayList<String> _sanitizerFunctions = new ArrayList<String>();
   
+  private boolean _runTaintAnalysis = false;
+  
   /**
    * Constructor.
    */
@@ -640,6 +642,23 @@ public class QuercusContext
     return _servletContext;
   }
 
+  /*
+   * ++ Taint Analysis
+   */
+  public boolean runTaintAnalysis() {
+  	return _runTaintAnalysis;
+  }
+  
+  /*
+   * ++ Taint Analysis
+   */
+  public void setTaintAnalysis(boolean runit) {
+  	_runTaintAnalysis = runit;
+  }  
+  
+  /*
+   * ++ Taint Analysis
+   */
   public File getTaintSinkFile() {
   	return _taintSinkFile;
   }  
@@ -665,6 +684,13 @@ public class QuercusContext
   			log.log(Level.INFO, "[TAINT ANALYSIS] \n" + e.getMessage(), e);
   		}  		
   	}
+  }
+  
+  /*
+   * ++ Taint Analysis
+   */  
+  public File getTaintSanitizerFile() {
+  	return _taintSanitizerFile;
   }
   
   /*

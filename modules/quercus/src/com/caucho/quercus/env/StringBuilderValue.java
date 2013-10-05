@@ -1678,9 +1678,10 @@ public class StringBuilderValue
   public void print(Env env)
   {  	
     env.write(_buffer, 0, _length);
-    if ( this.isTainted() ) {
-    	log.log(Level.WARNING, "[TAINT ANALYSIS][StringBuilderValue.print]: '" + 
-    					getValue().trim() + "' used. Tainted from " + this.getTaintInfo().toString());
+    
+    if ( env.getQuercus().runTaintAnalysis() && this.isTainted() ) {
+    	log.log(Level.WARNING, "[TAINT ANALYSIS][StringBuilderValue.print]: Tainted value '" + 
+    					getValue() + "' printed. Tainted from " + this.getTaintInfo().toString());
     }
   }
 

@@ -8,6 +8,13 @@
     <servlet-name>Quercus Servlet</servlet-name>
     <servlet-class>com.caucho.quercus.servlet.QuercusServlet</servlet-class>
 
+    <!-- Specifies if the taint analysis should be running. 
+	 May takes values ON or OFF-->
+    <init-param>
+      <param-name>run-taint-analysis</param-name>
+      <param-value>ON</param-value>
+    </init-param>
+
     <!-- Specifies the file where sink functions for the taint analysis
 	 are declared. -->
     <init-param>
@@ -23,12 +30,12 @@
       <param-value>WEB-INF/ta-sanitizer.cfg</param-value>
     </init-param>
 
-    <!--
+    
     <init-param>
       <param-name>ini-file</param-name>
       <param-value>WEB-INF/php.ini</param-value>
     </init-param>
-    -->
+   
     
     <!--
       Location of the license to enable php to java compilation.

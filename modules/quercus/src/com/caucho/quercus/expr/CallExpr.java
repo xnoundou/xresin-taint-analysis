@@ -30,6 +30,7 @@
 package com.caucho.quercus.expr;
 
 import com.caucho.quercus.Location;
+import com.caucho.quercus.env.ConstStringValue;
 import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.EnvVar;
 import com.caucho.quercus.env.NullValue;
@@ -38,11 +39,18 @@ import com.caucho.quercus.env.QuercusClass;
 import com.caucho.quercus.env.Value;
 import com.caucho.quercus.function.AbstractFunction;
 import com.caucho.quercus.lib.string.StringModule;
+import com.caucho.quercus.page.InterpretedPage;
+import com.caucho.quercus.program.QuercusProgram;
+import com.caucho.quercus.statement.ExprStatement;
+import com.caucho.quercus.statement.Statement;
+import com.caucho.quercus.statement.TextStatement;
 import com.caucho.util.L10N;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.LinkedHashMap;
 
 /**
  * A "foo(...)" function call.
@@ -209,40 +217,47 @@ public class CallExpr extends Expr {
     }
 
     Value []args = evalArgs(env, _args);
-
-    if ( env.isTaintSinkFunction(_name.toString()) ) {
-    	for (Value arg: args) {
-    		if ( null != arg && arg.isTainted() ) {
-    			log.log(Level.WARNING, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
-    					arg.toString() + "' used to call sink function " + fun.getName() + ". Tainted from " +
-    					arg.getTaintInfo() + "." );     		
-    		}
-    	}
-    }
     
     env.pushCall(this, NullValue.NULL, args);
     
-    if ( env.isTaintSanitizerFunction(_name.toString()) ) {
+    if(env.getQuercus().runTaintAnalysis())  {
     	
-    	//PHP sanitizer function generally takes the string to 
-    	//sanitize as first argument.
-      for (int k=0; k < 1; ++k) {
-      	Value arg = args[k];
-    		if ( null != arg && arg.isTainted() ) {    			    
-    			EnvVar argVar = env.getGlobalEnvVar(arg.toStringValue(),
-              																false, /*do not auto create*/
-              																false /*no outputNotice*/
-              																);
-    			if (null != argVar) {
-    				argVar.setTaintInfo(null);    			
-      			log.log(Level.INFO, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
-      					arg.toString() + "', tainted from " + arg.getTaintInfo() +
-      					" has been sanitized by " + fun.getName() + "." );    				
+    	if ( env.isTaintSinkFunction(_name.toString()) ) {
+    		for( int k = 0; k < args.length; ++k ) {
+    			Value arg = args[k];
+    			if ( null != arg && arg.isTainted() ) {
+    				log.log(Level.WARNING, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
+    						arg.toString() + "' used to call sink function " + fun.getName() + ". Tainted from " +
+    						arg.getTaintInfo() + "." );     		
+
+    				env.addFirePHPLog(_args[k], arg, fun.getName());
+
     			}
-    			
     		}
     	}
-    }    
+    	else if ( env.isTaintSanitizerFunction(_name.toString()) ) {    	
+    		//PHP sanitizer function generally takes the string to 
+    		//sanitize as first argument.
+    		//We could improve this by specifying in the configuration
+    		//file ta-sanitizer.cfg which parameter gets sanitized.
+    		for (int k=0; k < 1; ++k) {
+    			Value arg = args[k];
+    			if ( null != arg && arg.isTainted() ) {    			    
+    				EnvVar argVar = env.getGlobalEnvVar(arg.toStringValue(),
+    						false, /*do not auto create*/
+    						false /*no outputNotice*/
+    						);
+    				
+    				if (null != argVar) {
+    					argVar.setTaintInfo(null);    			
+    					log.log(Level.INFO, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
+    							arg.toString() + "', tainted from " + arg.getTaintInfo() +
+    							" has been sanitized by " + fun.getName() + "." );    				
+    				}
+    			}
+    		}
+    	}
+    } //if env.getQuercus().runTaintAnalysis()
     
 
     // php/0249
@@ -276,7 +291,7 @@ public class CallExpr extends Expr {
       // XXX: qa/1d14 env.setThis(oldThis);
     }
   }
-
+  
   // Return an array containing the Values to be
   // passed in to this function.
 

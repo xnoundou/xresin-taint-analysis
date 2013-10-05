@@ -4,8 +4,8 @@ $con=mysqli_connect("localhost","pepsi","cola","test");
 
 $desk = $_GET["table"];
 
-#echo "Entered Name: " . $_POST["fname"] . "\n";
-#echo "Entered Age: " . $_POST["age"] . "\n";
+echo "Entered Name: " . $_POST["fname"] . "\n";
+echo "Entered Age: " . $_POST["age"] . "\n";
 
 $k = 0;
 $k += $_POST["age"];
@@ -28,6 +28,7 @@ else {
   $result = mysqli_query($con, $sql);
 
   if ($result) {
+    echo "A test\n"
     printf("Select returned %d rows.\n", mysqli_num_rows($result));
     printf("Query was %s .\n", $sql);
     mysqli_free_result($result);
@@ -42,4 +43,5 @@ else {
 
 echo "Now closing connection\n";
 mysqli_close($con);
+phpinfo();
 ?> 

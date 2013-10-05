@@ -100,14 +100,8 @@ abstract public class Value implements java.io.Serializable
   /*
    * ++ Taint Analysis
    */
-  public void setTaintInfo(TaintInfo taintInfo) {
+  public void setTaintInfo(TaintInfo taintInfo) {  	
   	_taintInfo = taintInfo;
-  	
-  	if ( null != _taintInfo && ! _taintInfo.eq(taintInfo) ) {
-  		//The value has become tainted, we create a new PHP statement
-  		//to log this into the firebug console
-  		
-  	}
   	
   }
   
@@ -3101,11 +3095,11 @@ abstract public class Value implements java.io.Serializable
   {
   	StringValue prtStr = toString(env);
   	
-    if ( this.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
-      				prtStr.toString() + "' used. Tainted from " +
-         			getTaintInfo() + ". (Value.print(Env))" );    	
+    if ( env.getQuercus().runTaintAnalysis() && this.isTainted() ) {
+      log.log(Level.WARNING, "[TAINT ANALYSIS][Value.print(Env)]: tainted value '" +
+      				prtStr.toString() + "' printed. Tainted from " + getTaintInfo() + "." );    	
     }  	
+    
     env.print(prtStr);
   }
 
@@ -3121,10 +3115,11 @@ abstract public class Value implements java.io.Serializable
     try {
     	
     	StringValue prtStr = toString(env);
-      if ( this.isTainted() ) {
-        log.log(Level.WARNING, "[TAINT ANALYSIS]: tainted value '" +
+    	
+      if ( env.getQuercus().runTaintAnalysis() && this.isTainted() ) {
+        log.log(Level.WARNING, "[TAINT ANALYSIS][Value.print(Env, WriteStream)]: tainted value '" +
         				prtStr.toString() + "' used. Tainted from " +
-           			getTaintInfo() + ". (Value.print(Env, WriteStream))" );    	
+           			getTaintInfo() + "." );    	
       }
     	
       out.print(prtStr);

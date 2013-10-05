@@ -40,6 +40,9 @@ public class Location {
   private final int _lineNumber;
   private final String _className;
   private final String _functionName;
+  
+  //++ Taint Analysis
+  private boolean _taintInstrument = false;  
 
   public Location(String fileName,
                   int lineNumber, String className,
@@ -63,6 +66,42 @@ public class Location {
     _lineNumber = lineNumber;
     _className = className;
     _functionName = functionName;
+  }
+  
+  /*
+   * ++ Taint Analysis
+   */
+  private Location(Location other, int lineNumber){
+  	_fileName = other._fileName;
+  	_userPath = other._userPath;
+  	
+  	_lineNumber = lineNumber;
+  	_className = other._className;
+  	_functionName = other._functionName;
+  }
+  
+  public static final Location getInstTaintLocation(Location curLoc) {
+  	Location instLoc = new Location(curLoc, curLoc.getLineNumber() + 1);
+  	
+  	instLoc._taintInstrument = true;
+  	
+  	return instLoc;
+  }
+  
+  /*
+   * ++ Taint Analysis
+   */
+  public final Location createNextLocation() {
+  	Location retLoc = new Location( this, _lineNumber + 1 );
+  	return retLoc;
+  }
+  
+  public boolean getTaintInstrument(){
+  	return _taintInstrument;
+  }
+  
+  public void setTaintInstrument(boolean taintInstrument){
+  	_taintInstrument = taintInstrument;
   }
 
   private Location()

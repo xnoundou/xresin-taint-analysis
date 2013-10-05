@@ -53,6 +53,14 @@ public class InterpretedPage extends QuercusPage
     _program = program;
   }
 
+  /*
+   * ++ Taint Analysis
+   */
+  public QuercusProgram getQuercusProgram() {
+  	return _program;
+  }
+  
+  
   /**
    * Returns true if the page is modified.
    */

@@ -1496,12 +1496,6 @@ public class StringModule extends AbstractQuercusModule {
   public static long print(Env env, Value value)
   {
     value.print(env);
-
-    if ( value.isTainted() ) {
-      log.log(Level.WARNING, "[TAINT ANALYSIS][StringModule.print]: '" +
-      				value.toString().trim() + "' used. Tainted from " +
-         			value.getTaintInfo().toString());    	
-    }
     
     return 1;
   }

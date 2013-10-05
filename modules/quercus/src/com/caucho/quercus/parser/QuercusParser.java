@@ -187,6 +187,18 @@ public class QuercusParser {
 
   private final static IntMap _insensitiveReserved = new IntMap();
   private final static IntMap _reserved = new IntMap();
+  
+  /*
+   * Taint Analysis
+   */
+  private final static LiteralStringExpr FIREPHP_FB_INCLUDE =
+  		new LiteralStringExpr(Env.getStringValue("FirePHPCore/fb.php"));
+  
+  /*
+   * Taint Analysis
+   */
+  private final static StringValue FIREPHP_OBSTART_CALL =
+  		Env.getStringValue("ob_start");   
 
   private QuercusContext _quercus;
 
@@ -547,7 +559,8 @@ public class QuercusParser {
     _function.setVariableVar(true);
     _function.setUsesSymbolTable(true);
 
-    Statement stmt = parseTop();
+    //++ Taint Analysis
+    Statement stmt = parseTop(_quercus.runTaintAnalysis());
 
     QuercusProgram program
       = new QuercusProgram(_quercus, _sourceFile,
@@ -618,11 +631,13 @@ public class QuercusParser {
 
     return fun;
   }
-
+  
   /**
    * Parses the top page.
+   * 
+   * ++ Taint Analysis
    */
-  Statement parseTop()
+  Statement parseTop(boolean taintAnalysisOn)
     throws IOException
   {
     _isTop = true;
@@ -647,7 +662,12 @@ public class QuercusParser {
       }
     }
 
-    statements.addAll(parseStatementList());
+    /*
+     * This change is to introduce "require_once('FirePHPCore/fb.php');"
+     * in php pages so that we can use the FirePHP API to log the use
+     * of tainted values on the Firebug console 
+     */
+    statements.addAll(parseStatementList(taintAnalysisOn));
 
     return _factory.createBlock(location, statements);
   }
@@ -667,14 +687,43 @@ public class QuercusParser {
     return statements;
   }
 
+  /*
+   * Taint Analysis
+   */  
+  private ArrayList<Statement> parseStatementList()
+      throws IOException
+    {
+  			return parseStatementList(false);
+    }
+  
   /**
    * Parses a statement list.
+   * 
+   * ++ Taint Analysis
    */
-  private ArrayList<Statement> parseStatementList()
+  private ArrayList<Statement> parseStatementList(boolean taintAnalysisOn)
     throws IOException
   {
     ArrayList<Statement> statementList = new ArrayList<Statement>();
 
+  	/*
+  	 * Adds the include statement and the ob_start() call 
+  	 * needed to use the FirePHP API on PHP pages  
+  	 */
+    if (taintAnalysisOn) {
+    	Location curLocation = getLocation();
+			
+    	FunIncludeOnceExpr requireFirePHPExpr = 
+    			new FunIncludeOnceExpr(curLocation, _sourceFile, FIREPHP_FB_INCLUDE);
+    	    	    	    	    	    	    	
+    	CallExpr obStartExpr = 
+    			new CallExpr(curLocation.createNextLocation(), 
+    					FIREPHP_OBSTART_CALL, new ArrayList<Expr>());
+    	
+			statementList.add(new ExprStatement(curLocation, requireFirePHPExpr));
+			statementList.add(new ExprStatement(curLocation, obStartExpr));
+    }
+    
     while (true) {
       Location location = getLocation();
 
