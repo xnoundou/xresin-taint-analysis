@@ -596,11 +596,10 @@ public class Env
    * ++ Taint Analysis
    * FirePHP
    */  
-  private final ExprStatement getFirePHPCallExpr(Expr phpVar, 
-  																							 String logMsg, 
-  																							 ClassConstExpr firePhpLogMode)
+  private final ExprStatement getFirePHPCallExpr(Expr phpVar, String logMsg, ClassConstExpr firePhpLogMode)
   {
 		ArrayList<Expr> cArgs = new ArrayList<Expr>();
+		
 		cArgs.add(phpVar);				 
 		cArgs.add(new LiteralStringExpr(getStringValue(logMsg)));
 		cArgs.add(firePhpLogMode);
@@ -610,10 +609,20 @@ public class Env
   }
   
   /*
+   * Taint Analysis
+   * FirePHP log
+   */
+  private static final String getFirePHPInfoString(Expr phpVar, int lineNumber, boolean tainted)
+  {		
+	  String tInfo = tainted ? ":tainted" : ":untainted";
+	  return lineNumber + ":" + phpVar + tInfo;	  
+  }
+  
+  /*
    * ++ Taint Analysis
    * FirePHP log
    */
-  public boolean addFirePHPLog(Expr phpVar, Value arg, String funcName) 
+  public boolean addWarningFirePHPLog(Expr phpVar, Value arg, String funcName) 
   {
   	if ( null != _page && _page instanceof InterpretedPage) {
   		QuercusProgram quercusProgram = ((InterpretedPage)_page).getQuercusProgram();
@@ -627,20 +636,16 @@ public class Env
   				StringBuffer logMsg = new StringBuffer("[Line ");
   				logMsg.append(curLoc.getLineNumber())
   							.append("] Tainted variable ")
-  						  .append(phpVar)
-  						  .append(" used at sink function: '")
-  						  .append(funcName)
-  						  .append("'");
+  							.append(phpVar)
+  							.append(" used at sink function: '")
+  							.append(funcName)
+  							.append("'");
 
-  				StringBuffer debugMsg = new StringBuffer();
-  				debugMsg.append(curLoc.getLineNumber())
-  								.append(":")
-  								.append(phpVar)
-  								.append(":tainted");
+  				String debugMsg = Env.getFirePHPInfoString(phpVar, curLoc.getLineNumber(), true);  							
   				
   				ArrayList<Statement> callStmts = new ArrayList<Statement>(); 
   				
-  				callStmts.add( this.getFirePHPCallExpr(phpVar, debugMsg.toString(), FIREPHP_INFO_CONST) );
+  				callStmts.add( this.getFirePHPCallExpr(phpVar, debugMsg, FIREPHP_INFO_CONST) );
   				callStmts.add( this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_WARN_CONST) );				  
 
   				for( Statement aCall : callStmts ) {
@@ -653,6 +658,34 @@ public class Env
 
   	return false;
   }
+  
+  /*
+   * ++ Taint Analysis
+   * FirePHP log
+   */
+  public boolean addInfoFirePHPLog(Expr phpVar, Value arg, String funcName) 
+  {
+  	if ( null != _page && _page instanceof InterpretedPage) {
+  		QuercusProgram quercusProgram = ((InterpretedPage)_page).getQuercusProgram();
+
+  		if ( null != quercusProgram ) {		 
+  			Statement statement = quercusProgram.getStatement();
+  			
+  			if ( null != statement && statement instanceof BlockStatement) {
+  				Location curLoc = this.getLocation();
+  				
+  				String logMsg = Env.getFirePHPInfoString(phpVar, curLoc.getLineNumber(), false);  				
+  				
+  				Statement aCall = this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_INFO_CONST);  				
+  				
+  				aCall.execute(this);
+  			}
+  			return true;
+  		}
+  	}
+
+  	return false;
+  }  
   
   private void fillGet(ArrayValue array, boolean isMagicQuotes)
   {

@@ -8,7 +8,7 @@ $table = "desk";
 echo "Entered Name: " . $name . "\n";
 echo "Entered Age: " . $age . "\n";
 
-$birth_date = 2013 - $age;
+$birth_date = date("Y") - $age;
 printf("%s was born in: %d\n", $name, $birth_date);
 
 $con=mysqli_connect("localhost","pepsi","cola","test");

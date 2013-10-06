@@ -220,39 +220,37 @@ public class CallExpr extends Expr {
     
     env.pushCall(this, NullValue.NULL, args);
     
-    if(env.getQuercus().runTaintAnalysis())  {
-    	
-    	if ( env.isTaintSinkFunction(_name.toString()) ) {
+    if(env.getQuercus().runTaintAnalysis()) {    	
+    	if (env.isTaintSinkFunction(_name.toString())) {
     		for( int k = 0; k < args.length; ++k ) {
     			Value arg = args[k];
     			if ( null != arg && arg.isTainted() ) {
     				log.log(Level.WARNING, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
     						arg.toString() + "' used to call sink function " + fun.getName() + ". Tainted from " +
     						arg.getTaintInfo() + "." );     		
-
-    				env.addFirePHPLog(_args[k], arg, fun.getName());
-
+    				env.addWarningFirePHPLog(_args[k], arg, fun.getName());
     			}
     		}
     	}
-    	else if ( env.isTaintSanitizerFunction(_name.toString()) ) {    	
+    	else if (env.isTaintSanitizerFunction(_name.toString())) {    	
     		//PHP sanitizer function generally takes the string to 
     		//sanitize as first argument.
     		//We could improve this by specifying in the configuration
     		//file ta-sanitizer.cfg which parameter gets sanitized.
     		for (int k=0; k < 1; ++k) {
     			Value arg = args[k];
-    			if ( null != arg && arg.isTainted() ) {    			    
-    				EnvVar argVar = env.getGlobalEnvVar(arg.toStringValue(),
-    						false, /*do not auto create*/
-    						false /*no outputNotice*/
-    						);
-    				
+    			if ( null != arg && arg.isTainted() ) {    		
+    				StringValue argVarName = ((VarExpr)_args[k])._name;
+    				EnvVar argVar = env.getGlobalEnvVar(argVarName,
+    													false, /*do not auto create*/
+    													false /*no outputNotice*/
+    													);    				
     				if (null != argVar) {
     					argVar.setTaintInfo(null);    			
     					log.log(Level.INFO, "[TAINT ANALYSIS][CallExpr.evalImpl]: '" +
     							arg.toString() + "', tainted from " + arg.getTaintInfo() +
-    							" has been sanitized by " + fun.getName() + "." );    				
+    							" has been sanitized by " + fun.getName() + "." );       					
+    					env.addInfoFirePHPLog(_args[k], arg, fun.getName());
     				}
     			}
     		}
