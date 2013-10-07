@@ -93,6 +93,7 @@ import com.caucho.quercus.resources.StreamContextResource;
 import com.caucho.quercus.statement.BlockStatement;
 import com.caucho.quercus.statement.ExprStatement;
 import com.caucho.quercus.statement.Statement;
+import com.caucho.quercus.statement.TextStatement;
 import com.caucho.util.CharBuffer;
 import com.caucho.util.FreeList;
 import com.caucho.util.IntMap;
@@ -648,6 +649,10 @@ public class Env
   				callStmts.add( this.getFirePHPCallExpr(phpVar, debugMsg, FIREPHP_INFO_CONST) );
   				callStmts.add( this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_WARN_CONST) );				  
 
+  				//We use this for our test units
+  				TextStatement tStmt = new TextStatement(this.getLocation(), Env.getStringValue(debugMsg+"<br>"));
+  				tStmt.execute(this);  				
+  				
   				for( Statement aCall : callStmts ) {
   					aCall.execute(this);
   				}
