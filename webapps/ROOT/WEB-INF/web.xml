@@ -15,6 +15,11 @@
       <param-value>ON</param-value>
     </init-param>
 
+    <init-param>
+      <param-name>taint-analysis-test-mode</param-name>
+      <param-value>ON</param-value>
+    </init-param>
+
     <!-- Specifies the file where sink functions for the taint analysis
 	 are declared. -->
     <init-param>

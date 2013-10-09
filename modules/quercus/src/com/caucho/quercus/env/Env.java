@@ -662,8 +662,10 @@ public class Env
   				callStmts.add( this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_WARN_CONST) );				  
 
   				//We use this for our test units
-  				TextStatement tStmt = getTestOutputString(phpVar, curLoc, true);
-  				tStmt.execute(this);  				
+  				if ( this.getQuercus().isTaintInTestMode() ) {
+  					TextStatement tStmt = getTestOutputString(phpVar, curLoc, true);
+  					tStmt.execute(this);  				
+  				}
   				
   				for( Statement aCall : callStmts ) {
   					aCall.execute(this);
@@ -696,8 +698,10 @@ public class Env
   				Statement aCall = this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_INFO_CONST);  				
   				
   				//We use this for our test units
-  				TextStatement tStmt = getTestOutputString(phpVar, curLoc, false);
-  				tStmt.execute(this);   				
+  				if ( this.getQuercus().isTaintInTestMode() ) {
+  					TextStatement tStmt = getTestOutputString(phpVar, curLoc, false);
+  					tStmt.execute(this);   				
+  				}
   				
   				aCall.execute(this);
   			}

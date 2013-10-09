@@ -68,7 +68,6 @@ import com.caucho.quercus.env.LongValue;
 import com.caucho.quercus.env.NullValue;
 import com.caucho.quercus.env.QuercusClass;
 import com.caucho.quercus.env.SessionArrayValue;
-import com.caucho.quercus.env.StringBuilderValue;
 import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.UnicodeBuilderValue;
 import com.caucho.quercus.env.Value;
@@ -259,6 +258,7 @@ public class QuercusContext
   private ArrayList<String> _sanitizerFunctions = new ArrayList<String>();
   
   private boolean _runTaintAnalysis = false;
+  private boolean _taintAnalysisTestMode = false;
   
   /**
    * Constructor.
@@ -659,6 +659,20 @@ public class QuercusContext
   /*
    * ++ Taint Analysis
    */
+  public boolean isTaintInTestMode() {
+  	return _taintAnalysisTestMode;
+  }
+  
+  /*
+   * ++ Taint Analysis
+   */
+  public void setTaintAnalysisTestMode(boolean taintAnalysisTestMode) {
+  	_taintAnalysisTestMode = taintAnalysisTestMode;
+  }  
+  
+  /*
+   * ++ Taint Analysis
+   */
   public File getTaintSinkFile() {
   	return _taintSinkFile;
   }  
@@ -676,6 +690,7 @@ public class QuercusContext
   				_sinkFunctions.add( nextLine.trim() );
   				nextLine = br.readLine();
   			}
+  			br.close();
   		}
   		catch(FileNotFoundException e) {
   			log.log(Level.INFO, "[TAINT ANALYSIS] Could not find sink functions file");
@@ -706,6 +721,7 @@ public class QuercusContext
   				_sanitizerFunctions.add( nextLine.trim() );
   				nextLine = br.readLine();
   			}
+  			br.close();
   		}
   		catch(FileNotFoundException e) {
   			log.log(Level.INFO, "[TAINT ANALYSIS] Could not find sanitizer functions file");

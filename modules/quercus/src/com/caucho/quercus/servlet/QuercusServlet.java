@@ -36,7 +36,6 @@ import com.caucho.quercus.lib.db.QuercusDataSource;
 import com.caucho.quercus.module.QuercusModule;
 import com.caucho.util.CurrentTime;
 import com.caucho.util.L10N;
-import com.caucho.vfs.FilePath;
 import com.caucho.vfs.Path;
 
 import javax.naming.Context;
@@ -97,6 +96,7 @@ public class QuercusServlet
    * ++ Taint Analysis
    */
   private boolean _runTaintAnalysis = false;
+  private boolean _taintAnalysisTestMode = false;
   private File _taintSinkFile;
   private File _taintSanitizerFile;
 
@@ -407,6 +407,17 @@ public class QuercusServlet
   
   /**
    * ++ Taint Analysis
+   * Sets variable '_taintAnalysisTestMode' which specifies if
+   * the taint analysis should run in testing mode
+   */
+  public void setTaintAnalysisTestMode(boolean taintAnalysisTestMode)
+  {
+    _taintAnalysisTestMode = taintAnalysisTestMode;
+  }
+    
+  
+  /**
+   * ++ Taint Analysis
    * Sets the file where sink functions for taint analysis are declared.
    */
   public void setSinkFunction(String relPath)
@@ -523,6 +534,10 @@ public class QuercusServlet
     else if ("taint-sanitizer".equals(paramName)) { //++ Taint Analysis
       setSanitizerFunction(paramValue);      
     }
+    else if ("taint-analysis-test-mode".equals(paramName)) { //++ Taint Analysis
+    	if ( null != paramValue && paramValue.equalsIgnoreCase(TAINT_ANALYSIS_ON))
+    		setTaintAnalysisTestMode(true);     
+    }    
     else if ("run-taint-analysis".equals(paramName)) { //++ Taint Analysis    
     	if ( null != paramValue && paramValue.equalsIgnoreCase(TAINT_ANALYSIS_ON))
     		setTaintAnalysis(true);
@@ -590,6 +605,7 @@ public class QuercusServlet
     
     //++ Taint Analysis
     if ( _runTaintAnalysis ) {
+    	quercus.setTaintAnalysisTestMode(_taintAnalysisTestMode);
     	quercus.setTaintSinkFile(_taintSinkFile);
     	quercus.setTaintSanitizerFile(_taintSanitizerFile);
     }
