@@ -29,10 +29,12 @@
 
 package com.caucho.quercus.expr;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.caucho.quercus.Location;
 import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.Value;
-import com.caucho.quercus.env.Var;
 
 /**
  * Represents a PHP assignment expression.
@@ -41,6 +43,8 @@ public class BinaryAssignExpr extends Expr {
   protected final AbstractVarExpr _var;
   protected final Expr _value;
 
+  private static final Logger log = Logger.getLogger(BinaryAssignExpr.class.getName()); 
+  
   public BinaryAssignExpr(Location location, AbstractVarExpr var, Expr value)
   {
     super(location);
@@ -80,6 +84,8 @@ public class BinaryAssignExpr extends Expr {
    *
    * @param env the calling environment.
    *
+   * ++ Taint Analysis
+   *
    * @return the expression value.
    */
   @Override
@@ -87,6 +93,31 @@ public class BinaryAssignExpr extends Expr {
   {
   	Value retVal = _var.evalAssignValue(env, _value);   	
     
+  	if ( env.getQuercus().runTaintAnalysis() ) {
+  		if ( _value instanceof CallExpr ) {
+  			CallExpr c = (CallExpr) _value;
+  			String funName = c.getName().toString();
+  			
+    		//PHP sanitizers generally take the string to sanitize as first argument.
+    		//We could improve this by specifying in the configuration
+    		//file ta-sanitizer.cfg which parameter gets sanitized.
+  			if ( env.isTaintSanitizerFunction(funName) ) {		
+  				String funArgName = "";
+  				if ( c._args.length > 0 && null != c._args[0] )
+  					funArgName = c._args[0].toString();  		
+  			  			  				  	
+					log.log(Level.INFO, "[TAINT ANALYSIS][BinaryAssignExpr.eval(Env)]: '" 
+									+ funArgName + "' has been sanitized by " + funName + "." );   
+					
+					//Make the assigned value untainted
+					_var.setTaint(null);
+					
+					//Write FirePHP log
+					env.addInfoFirePHPLog(_var, funName);  				
+  			}
+  		}
+  	}
+  	
     return retVal;
   }
 

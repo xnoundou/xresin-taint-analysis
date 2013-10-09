@@ -619,6 +619,18 @@ public class Env
 	  return lineNumber + ":" + phpVar + tInfo;	  
   }
   
+  private static final TextStatement getTestOutputString(Expr phpVar, Location location, boolean tainted) 
+  {
+		String debugMsg = Env.getFirePHPInfoString(phpVar, 
+																							 location.getLineNumber(),
+																							 tainted);  							
+						  
+		//We use this for our test units
+		TextStatement tStmt = new TextStatement(location, Env.getStringValue(debugMsg+"<br>"));
+		
+		return tStmt;
+  }
+  
   /*
    * ++ Taint Analysis
    * FirePHP log
@@ -650,7 +662,7 @@ public class Env
   				callStmts.add( this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_WARN_CONST) );				  
 
   				//We use this for our test units
-  				TextStatement tStmt = new TextStatement(this.getLocation(), Env.getStringValue(debugMsg+"<br>"));
+  				TextStatement tStmt = getTestOutputString(phpVar, curLoc, true);
   				tStmt.execute(this);  				
   				
   				for( Statement aCall : callStmts ) {
@@ -668,7 +680,7 @@ public class Env
    * ++ Taint Analysis
    * FirePHP log
    */
-  public boolean addInfoFirePHPLog(Expr phpVar, Value arg, String funcName) 
+  public boolean addInfoFirePHPLog(Expr phpVar, String funcName) 
   {
   	if ( null != _page && _page instanceof InterpretedPage) {
   		QuercusProgram quercusProgram = ((InterpretedPage)_page).getQuercusProgram();
@@ -682,6 +694,10 @@ public class Env
   				String logMsg = Env.getFirePHPInfoString(phpVar, curLoc.getLineNumber(), false);  				
   				
   				Statement aCall = this.getFirePHPCallExpr(phpVar, logMsg.toString(), FIREPHP_INFO_CONST);  				
+  				
+  				//We use this for our test units
+  				TextStatement tStmt = getTestOutputString(phpVar, curLoc, false);
+  				tStmt.execute(this);   				
   				
   				aCall.execute(this);
   			}
