@@ -1,0 +1,19 @@
+@author: Xavier N. Noumbissi (xnoumbis@uwaterloo.ca)
+Website: http://ece.uwaterloo.ca/~xnoumbis
+----------------------------------------------------------------------
+
+We implemented a dynamic taint analysis for the resin PHP interpreter.
+All modified part of the files are labelled with the comment: 
+//++ Taint Analysis
+
+A report about the work can be found at: 
+http://ece.uwaterloo.ca/~xnoumbis/files/cs846-nnoumbissi.pdf
+
+I have added three additional help scripts: $ROOT/restart.sh,
+$ROOT/start.sh, $ROOT/stop.sh
+
+Testing
+-------
+The files I used for testing the taint analysis are to be found at:
+https://github.com/xnoumbis/resin-taint-analysis-tests.git
+
